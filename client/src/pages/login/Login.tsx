@@ -1,10 +1,20 @@
 import { ModeToggle } from '@/components/mode-toggle'
 import LoginForm from '@/pages/login/components/LoginForm'
 import NavItems from '@/pages/login/NavItems'
+import { useAppSelector } from '@/redux/hook'
 import { Package2 } from 'lucide-react'
-import { Link } from 'react-router'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router'
 
 export default function Login() {
+  const auth = useAppSelector((state) => state.auth)
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (auth.isLoggedIn) {
+      navigate('/')
+      return
+    }
+  }, [auth, navigate])
   return (
     <>
       <div className='relative flex flex-col w-full min-h-screen'>
