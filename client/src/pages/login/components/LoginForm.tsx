@@ -5,6 +5,7 @@ import { login } from '@/pages/login/authSlice'
 import { PasswordInput } from '@/pages/login/components/PasswordInput'
 import { useAppDispatch } from '@/redux/hook'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
+import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
@@ -19,11 +20,12 @@ export default function LoginForm() {
   })
 
   function onSubmit(values: LoginBodyType) {
-    console.log(values)
     dispatch(login(values))
       .unwrap()
       .then((res) => console.log(res))
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        handleErrorApi({ error: err, setError: form.setError })
+      })
   }
   return (
     <Form {...form}>
@@ -31,26 +33,26 @@ export default function LoginForm() {
         <FormField
           control={form.control}
           name='email'
-          render={({ field }) => (
+          render={({ field, formState: { errors } }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input placeholder='Username' {...field} />
               </FormControl>
-              <FormMessage />
+              {errors.email && <FormMessage>{errors.email.message}</FormMessage>}
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
           name='password'
-          render={({ field }) => (
+          render={({ field, formState: { errors } }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <PasswordInput placeholder='password' {...field} />
               </FormControl>
-              <FormMessage />
+              {errors.password && <FormMessage>{errors.password.message}</FormMessage>}
             </FormItem>
           )}
         />

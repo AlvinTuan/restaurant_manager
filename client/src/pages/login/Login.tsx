@@ -1,5 +1,5 @@
 import { ModeToggle } from '@/components/mode-toggle'
-import LoginForm from '@/pages/login/LoginForm'
+import LoginForm from '@/pages/login/components/LoginForm'
 import NavItems from '@/pages/login/NavItems'
 import { Package2 } from 'lucide-react'
 import { Link } from 'react-router'

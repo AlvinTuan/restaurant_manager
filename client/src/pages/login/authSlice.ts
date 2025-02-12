@@ -19,11 +19,16 @@ export const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.isLoggedIn = true
-      state.status = 'succeeded'
-      state.account = action.payload.data.account
-    })
+    builder
+      .addCase(login.fulfilled, (state, action) => {
+        state.isLoggedIn = true
+        state.status = 'succeeded'
+        state.account = action.payload.data.account
+      })
+      .addCase(login.rejected, (state) => {
+        state.isLoggedIn = false
+        state.status = 'failed'
+      })
   }
 })
 
@@ -31,7 +36,7 @@ export const login = createAsyncThunk<LoginResType, LoginBodyType>('auth/login',
   try {
     const res = await authApi.loginRequest(info, { signal: thunkAPI.signal })
     return res.data // Đảm bảo trả về dữ liệu JSON thực tế
-  } catch (error) {
+  } catch (error: any) {
     return thunkAPI.rejectWithValue(error)
   }
 })
