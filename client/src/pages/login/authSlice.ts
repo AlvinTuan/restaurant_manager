@@ -1,6 +1,7 @@
 import authApi from '@/apiRequests/auth.api'
-import { LoginBodyType, LoginResType } from '@/schemaValidations/auth.schema'
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { LoginBodyType, LoginResType, LogoutBodyType } from '@/schemaValidations/auth.schema'
+import { getAccessTokenFromLS } from '@/utils/auth'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface AuthState {
   isLoggedIn: boolean
@@ -10,14 +11,21 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  isLoggedIn: false,
+  isLoggedIn: Boolean(getAccessTokenFromLS()),
   status: 'idle'
 }
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    signOut: (state, _action: PayloadAction) => {
+      state.isLoggedIn = false
+      state.status = 'idle'
+      state.account = undefined
+    }
+  },
   extraReducers(builder) {
     builder
       .addCase(login.fulfilled, (state, action) => {
@@ -29,14 +37,24 @@ export const authSlice = createSlice({
         state.isLoggedIn = false
         state.status = 'failed'
       })
+      .addCase(logout.fulfilled, (state) => {
+        state.isLoggedIn = false
+        state.status = 'idle'
+        state.account = undefined
+      })
   }
 })
 
-export const login = createAsyncThunk<LoginResType, LoginBodyType>('auth/login', async (info, thunkAPI) => {
+export const login = createAsyncThunk<LoginResType, LoginBodyType>('auth/login', async (body, thunkAPI) => {
   try {
-    const res = await authApi.loginRequest(info, { signal: thunkAPI.signal })
+    const res = await authApi.loginRequest(body)
     return res.data // Đảm bảo trả về dữ liệu JSON thực tế
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error)
   }
+})
+
+export const logout = createAsyncThunk<{ message: string }, LogoutBodyType>('auth/logout', async (body) => {
+  const res = await authApi.logoutRequest(body)
+  return res.data
 })

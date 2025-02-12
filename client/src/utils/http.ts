@@ -1,4 +1,12 @@
-import { getAccessTokenFromLS } from '@/utils/auth'
+import { path } from '@/constants/path'
+import { LoginResType } from '@/schemaValidations/auth.schema'
+import {
+  clearLS,
+  getAccessTokenFromLS,
+  getRefreshTokenFromLS,
+  setAccessTokenToLS,
+  setRefreshTokenToLS
+} from '@/utils/auth'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,15 +48,23 @@ export class EntityError extends HttpError {
 class Http {
   instance: AxiosInstance
   private accessToken: string
+  private refreshToken: string
   constructor() {
     this.accessToken = getAccessTokenFromLS()
+    this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
       baseURL: 'http://localhost:4000/',
-      timeout: 10000
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
     // Add a request interceptor
     this.instance.interceptors.request.use(
-      function (config) {
+      (config) => {
+        if (this.accessToken && config.headers) {
+          config.headers.Authorization = `Bearer ${this.accessToken}`
+        }
         return config
       },
       function (error) {
@@ -58,7 +74,18 @@ class Http {
 
     // Add a response interceptor
     this.instance.interceptors.response.use(
-      function (response) {
+      (response) => {
+        const { url } = response.config
+        if (url === path.login) {
+          this.accessToken = (response.data as LoginResType).data.accessToken
+          this.refreshToken = (response.data as LoginResType).data.refreshToken
+          setAccessTokenToLS(this.accessToken)
+          setRefreshTokenToLS(this.refreshToken)
+        } else {
+          this.accessToken = ''
+          this.refreshToken = ''
+          clearLS()
+        }
         return response
       },
       function (error: AxiosError) {

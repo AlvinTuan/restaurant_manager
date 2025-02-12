@@ -21,11 +21,8 @@ export const getAccountToLS = () => {
   return result ? JSON.parse(result) : null
 }
 
-export const LocalStorageEventTarget = new EventTarget()
 export const clearLS = () => {
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
   localStorage.removeItem('account')
-  const clearLSEvent = new Event('clearLS')
-  LocalStorageEventTarget.dispatchEvent(clearLSEvent)
 }

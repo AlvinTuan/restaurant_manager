@@ -1,9 +1,13 @@
-import { LoginBodyType, LoginResType } from '@/schemaValidations/auth.schema'
+import { path } from '@/constants/path'
+import { LoginBodyType, LoginResType, LogoutBodyType } from '@/schemaValidations/auth.schema'
 import http from '@/utils/http'
 
 const authApi = {
-  loginRequest(body: LoginBodyType, options?: { signal?: AbortSignal }) {
-    return http.post<LoginResType>('auth/login', body, options)
+  loginRequest(body: LoginBodyType) {
+    return http.post<LoginResType>(path.login, body)
+  },
+  logoutRequest(body: LogoutBodyType) {
+    return http.post(path.logout, body)
   }
 }
 

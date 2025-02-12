@@ -9,12 +9,18 @@ import { Link, useNavigate } from 'react-router'
 export default function Login() {
   const auth = useAppSelector((state) => state.auth)
   const navigate = useNavigate()
+  // const location = useLocation()
+  // const from = location.state.pathname ?? '/'
   useEffect(() => {
     if (auth.isLoggedIn) {
       navigate('/')
       return
     }
   }, [auth, navigate])
+
+  // const handleLoginSuccess = () => {
+  //   navigate(from) // Quay về trang gốc hoặc '/' nếu không có from
+  // }
   return (
     <>
       <div className='relative flex flex-col w-full min-h-screen'>

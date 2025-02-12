@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/hooks/use-toast'
 import { login } from '@/pages/login/authSlice'
 import { PasswordInput } from '@/pages/login/components/PasswordInput'
 import { useAppDispatch } from '@/redux/hook'
@@ -10,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 export default function LoginForm() {
+  const { toast } = useToast()
   const dispatch = useAppDispatch()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -22,7 +24,13 @@ export default function LoginForm() {
   function onSubmit(values: LoginBodyType) {
     dispatch(login(values))
       .unwrap()
-      .then((res) => console.log(res))
+      .then((res) => {
+        console.log(res)
+        toast({
+          description: res.message,
+          duration: 3000
+        })
+      })
       .catch((err) => {
         handleErrorApi({ error: err, setError: form.setError })
       })

@@ -23,6 +23,7 @@ export default function MainLayout() {
       }
     }
   }, [auth, navigate, pathname])
+
   return (
     <>
       <header>Header</header>
