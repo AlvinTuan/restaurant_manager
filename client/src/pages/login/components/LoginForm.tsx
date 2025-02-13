@@ -67,9 +67,9 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type='submit' disabled={auth.status === 'loading'}>
+        <Button className='w-full' type='submit' disabled={auth.status === 'loading'}>
           {auth.status === 'loading' && <Loader2 className='animate-spin' />}
-          Submit
+          Đăng nhập
         </Button>
       </form>
     </Form>

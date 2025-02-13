@@ -36,8 +36,8 @@ export default function Login() {
             <ModeToggle />
           </div>
         </header>
-        <main className='flex flex-col items-center flex-1 gap-4 p-4 md:gap-8 md:p-8'>
-          <div className='max-w-[350px] w-full'>
+        <main className='flex items-center justify-center'>
+          <div className='max-w-[350px] w-full top-1/2 translate-y-1/2'>
             <LoginForm />
           </div>
         </main>

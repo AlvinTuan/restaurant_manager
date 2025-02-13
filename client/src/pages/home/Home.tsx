@@ -1,6 +1,8 @@
+import { path } from '@/constants/path'
 import { logout } from '@/pages/login/authSlice'
 import { useAppDispatch } from '@/redux/hook'
 import { getRefreshTokenFromLS } from '@/utils/auth'
+import { Link } from 'react-router'
 
 export default function Home() {
   const dispatch = useAppDispatch()
@@ -15,6 +17,8 @@ export default function Home() {
   return (
     <div>
       Home
+      <br />
+      <Link to={path.profile}>Quản lý</Link>
       <div onClick={() => handleLogout(refreshToken)}>logout</div>
     </div>
   )
