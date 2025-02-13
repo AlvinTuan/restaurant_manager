@@ -4,15 +4,18 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { login } from '@/pages/login/authSlice'
 import { PasswordInput } from '@/pages/login/components/PasswordInput'
-import { useAppDispatch } from '@/redux/hook'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
 export default function LoginForm() {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
+  const auth = useAppSelector((state) => state.auth)
+  console.log('auth', auth)
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -64,7 +67,10 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Submit</Button>
+        <Button type='submit' disabled={auth.status === 'loading'}>
+          {auth.status === 'loading' && <Loader2 className='animate-spin' />}
+          Submit
+        </Button>
       </form>
     </Form>
   )

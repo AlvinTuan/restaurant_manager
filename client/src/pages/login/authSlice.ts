@@ -28,6 +28,9 @@ export const authSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      .addCase(login.pending, (state) => {
+        state.status = 'loading'
+      })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoggedIn = true
         state.status = 'succeeded'
