@@ -1,4 +1,3 @@
-import accountApi from '@/apiRequests/account.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,17 +8,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { useAppDispatch } from '@/redux/hook'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
 import { logout } from '@/redux/slice/authSlice'
-import { AccountResType } from '@/schemaValidations/account.schema'
 import { getRefreshTokenFromLS } from '@/utils/auth'
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
 export default function DropdownAvatar() {
-  const [account, setAccount] = useState<AccountResType['data'] | null>(null)
   const dispatch = useAppDispatch()
   const refresh_token = getRefreshTokenFromLS()
+  const { account } = useAppSelector((state) => state.account)
 
   const handleLogout = (refreshToken: string) => {
     dispatch(
@@ -28,18 +25,7 @@ export default function DropdownAvatar() {
       })
     )
   }
-  useEffect(() => {
-    const controller = new AbortController()
-    async function fetchData() {
-      const res = await accountApi.me({ signal: controller.signal })
-      setAccount(res.data.data)
-    }
 
-    fetchData()
-    return () => {
-      controller.abort()
-    }
-  }, [])
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

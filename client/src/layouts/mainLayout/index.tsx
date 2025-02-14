@@ -2,7 +2,8 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { path } from '@/constants/path'
 import { Role } from '@/constants/type'
 import Header from '@/layouts/mainLayout/header'
-import { useAppSelector } from '@/redux/hook'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { getMe } from '@/redux/slice/accountSlice'
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 
@@ -12,6 +13,7 @@ export default function MainLayout() {
   const auth = useAppSelector((state) => state.auth)
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   useEffect(() => {
     if (UNAUTHORIZED_ROUTES.includes(pathname)) {
       return
@@ -29,7 +31,8 @@ export default function MainLayout() {
         navigate('/', { state: { from: pathname } })
       }
     }
-  }, [auth, navigate, pathname])
+    dispatch(getMe())
+  }, [auth, navigate, pathname, dispatch])
 
   return (
     <>
