@@ -1,5 +1,5 @@
 import { ModeToggle } from '@/components/mode-toggle'
-import DropdownAvatar from '@/layouts/MainLayout/Header/DropdownAvatar'
+import DropdownAvatar from '@/layouts/mainLayout/header/dropdown-avatar'
 
 export default function Header() {
   return (

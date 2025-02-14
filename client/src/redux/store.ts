@@ -1,4 +1,4 @@
-import { authSlice } from '@/pages/login/authSlice'
+import { authSlice } from '@/redux/slice/authSlice'
 import { configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'

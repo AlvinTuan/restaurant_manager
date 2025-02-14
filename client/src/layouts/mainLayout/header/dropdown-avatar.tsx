@@ -9,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { logout } from '@/pages/login/authSlice'
 import { useAppDispatch } from '@/redux/hook'
+import { logout } from '@/redux/slice/authSlice'
 import { AccountResType } from '@/schemaValidations/account.schema'
 import { getRefreshTokenFromLS } from '@/utils/auth'
 import { useEffect, useState } from 'react'

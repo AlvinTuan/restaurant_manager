@@ -1,6 +1,6 @@
 import { ModeToggle } from '@/components/mode-toggle'
-import LoginForm from '@/pages/login/components/LoginForm'
-import NavItems from '@/pages/login/NavItems'
+import LoginForm from '@/pages/login/components/login-form'
+import NavItems from '@/pages/login/nav-items'
 import { useAppSelector } from '@/redux/hook'
 import { Package2 } from 'lucide-react'
 import { useEffect } from 'react'

@@ -1,6 +1,6 @@
 import { path } from '@/constants/path'
-import { logout } from '@/pages/login/authSlice'
 import { useAppDispatch } from '@/redux/hook'
+import { logout } from '@/redux/slice/authSlice'
 import { getRefreshTokenFromLS } from '@/utils/auth'
 import { Link } from 'react-router'
 

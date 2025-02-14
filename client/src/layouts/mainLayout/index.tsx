@@ -1,7 +1,7 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { path } from '@/constants/path'
 import { Role } from '@/constants/type'
-import Header from '@/layouts/MainLayout/Header/Header'
+import Header from '@/layouts/mainLayout/header'
 import { useAppSelector } from '@/redux/hook'
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
