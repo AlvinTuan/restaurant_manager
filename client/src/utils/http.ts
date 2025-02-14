@@ -1,4 +1,3 @@
-import { path } from '@/constants/path'
 import { LoginResType } from '@/schemaValidations/auth.schema'
 import {
   clearLS,
@@ -9,7 +8,6 @@ import {
 } from '@/utils/auth'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 enum HttpStatus {
   ENTITY_ERROR_STATUS = 422
 }
@@ -54,10 +52,7 @@ class Http {
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
       baseURL: 'http://localhost:4000/',
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      timeout: 10000
     })
     // Add a request interceptor
     this.instance.interceptors.request.use(
@@ -76,12 +71,12 @@ class Http {
     this.instance.interceptors.response.use(
       (response) => {
         const { url } = response.config
-        if (url === path.login) {
+        if (url === 'auth/login') {
           this.accessToken = (response.data as LoginResType).data.accessToken
           this.refreshToken = (response.data as LoginResType).data.refreshToken
           setAccessTokenToLS(this.accessToken)
           setRefreshTokenToLS(this.refreshToken)
-        } else {
+        } else if (url === 'auth/logout') {
           this.accessToken = ''
           this.refreshToken = ''
           clearLS()

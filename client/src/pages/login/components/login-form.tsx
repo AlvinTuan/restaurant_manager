@@ -2,9 +2,9 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
-import { login } from '@/pages/login/authSlice'
-import { PasswordInput } from '@/pages/login/components/PasswordInput'
+import { PasswordInput } from '@/pages/login/components/password-input'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { login } from '@/redux/slice/authSlice'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -67,9 +67,9 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type='submit' disabled={auth.status === 'loading'}>
+        <Button className='w-full' type='submit' disabled={auth.status === 'loading'}>
           {auth.status === 'loading' && <Loader2 className='animate-spin' />}
-          Submit
+          Đăng nhập
         </Button>
       </form>
     </Form>

@@ -1,5 +1,7 @@
 export enum path {
   home = '/',
-  login = 'auth/login',
-  logout = 'auth/logout'
+  login = '/login',
+  logout = '/logout',
+  profile = '/manage/dashboard',
+  manageSetting = '/manage/setting'
 }

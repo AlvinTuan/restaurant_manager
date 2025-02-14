@@ -1,4 +1,5 @@
-import { authSlice } from '@/pages/login/authSlice'
+import { accountSlice } from '@/redux/slice/accountSlice'
+import { authSlice } from '@/redux/slice/authSlice'
 import { configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -9,10 +10,12 @@ const persistConfig = {
 }
 
 const persistedAuthReducer = persistReducer(persistConfig, authSlice.reducer)
+const persistedAccountReducer = persistReducer(persistConfig, accountSlice.reducer)
 
 export const store = configureStore({
   reducer: {
-    auth: persistedAuthReducer
+    auth: persistedAuthReducer,
+    account: persistedAccountReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

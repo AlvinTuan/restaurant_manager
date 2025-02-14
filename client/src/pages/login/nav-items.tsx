@@ -11,13 +11,11 @@ const menuItems = [
   },
   {
     title: 'Đăng nhập',
-    href: '/login',
-    authRequired: false
+    href: '/login'
   },
   {
     title: 'Quản lý',
-    href: '/manage/dashboard',
-    authRequired: true
+    href: '/manage/dashboard'
   }
 ]
 
