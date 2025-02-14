@@ -4,8 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useAppSelector } from '@/redux/hook'
+import { useToast } from '@/hooks/use-toast'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { updateMe, uploadImage } from '@/redux/slice/accountSlice'
 import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
+import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -14,12 +17,14 @@ import { useForm } from 'react-hook-form'
 export default function UpdateProfileForm() {
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
+  const dispatch = useAppDispatch()
   const { account } = useAppSelector((state) => state.account)
+  const { toast } = useToast()
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: '',
-      avatar: ''
+      avatar: undefined
     }
   })
   const avatar = form.watch('avatar')
@@ -35,13 +40,49 @@ export default function UpdateProfileForm() {
 
   useEffect(() => {
     if (account) {
-      form.reset({ name: account.name, avatar: account.avatar ?? '' })
+      form.reset({ name: account.name, avatar: account.avatar ?? undefined })
     }
   }, [account, form])
 
+  const reset = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const onSubmit = async (values: UpdateMeBodyType) => {
+    try {
+      let body = values
+      // upload image
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const imageUrl = uploadImageRes.data
+        body = {
+          ...values,
+          avatar: imageUrl
+        }
+      }
+      const updateMeRes = await dispatch(updateMe(body)).unwrap()
+      toast({
+        description: updateMeRes.message
+      })
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className='grid items-start gap-4 auto-rows-max md:gap-8'>
+      <form
+        noValidate
+        className='grid items-start gap-4 auto-rows-max md:gap-8'
+        onReset={reset}
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         <Card x-chunk='dashboard-07-chunk-0'>
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
@@ -51,7 +92,7 @@ export default function UpdateProfileForm() {
               <FormField
                 control={form.control}
                 name='avatar'
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <div className='flex items-start justify-start gap-2'>
                       <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
@@ -67,7 +108,10 @@ export default function UpdateProfileForm() {
                         onChange={(event) => {
                           const file = event.target.files?.[0]
                           // console.log(file)
-                          if (file) setFile(file)
+                          if (file) {
+                            setFile(file)
+                            field.onChange('http://localhost:3000/' + field.name) // to pass zod
+                          }
                         }}
                       />
                       <button

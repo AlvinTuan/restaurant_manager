@@ -52,10 +52,7 @@ class Http {
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
       baseURL: 'http://localhost:4000/',
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      timeout: 10000
     })
     // Add a request interceptor
     this.instance.interceptors.request.use(

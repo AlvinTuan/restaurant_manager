@@ -3,12 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+import accountApi from '@/apiRequests/account.api'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { useToast } from '@/hooks/use-toast'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
+import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 export default function ChangePasswordForm() {
+  const { toast } = useToast()
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -17,10 +21,28 @@ export default function ChangePasswordForm() {
       confirmPassword: ''
     }
   })
+  const reset = () => {
+    form.reset()
+  }
+
+  const onSubmit = async (values: ChangePasswordBodyType) => {
+    try {
+      const changePasswordRes = await accountApi.changePasswordRequest(values)
+      toast({ description: changePasswordRes.data.message })
+      reset()
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
 
   return (
     <Form {...form}>
-      <form noValidate className='grid items-start gap-4 auto-rows-max md:gap-8'>
+      <form
+        noValidate
+        className='grid items-start gap-4 auto-rows-max md:gap-8'
+        onSubmit={form.handleSubmit(onSubmit)}
+        onReset={reset}
+      >
         <Card className='overflow-hidden' x-chunk='dashboard-07-chunk-4'>
           <CardHeader>
             <CardTitle>Đổi mật khẩu</CardTitle>

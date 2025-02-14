@@ -1,6 +1,6 @@
 import accountApi from '@/apiRequests/account.api'
 import { mediaRequest } from '@/apiRequests/media.api'
-import { AccountResType } from '@/schemaValidations/account.schema'
+import { AccountResType, UpdateMeBodyType } from '@/schemaValidations/account.schema'
 import { UploadImageResType } from '@/schemaValidations/media.schema'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
@@ -24,23 +24,39 @@ export const accountSlice = createSlice({
         state.status = 'succeeded'
         state.account = action.payload.data
       })
-      .addCase(uploadImage.fulfilled, (state, action) => {
+      // .addCase(uploadImage.fulfilled, (state, action) => {
+      //   state.status = 'succeeded'
+      //   if (state.account) {
+      //     state.account.avatar = action.payload.data
+      //   }
+      // })
+      .addCase(updateMe.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        if (state.account) {
-          state.account.avatar = action.payload.data
-        }
+        state.account = action.payload.data
       })
   }
 })
 
-export const getMe = createAsyncThunk<AccountResType>('accounts/me', async (_props, thunkAPI) => {
+export const getMe = createAsyncThunk<AccountResType>('accounts/getMe', async (_props, thunkAPI) => {
   try {
-    const res = await accountApi.me({ signal: thunkAPI.signal })
+    const res = await accountApi.meRequest({ signal: thunkAPI.signal })
     return res.data
   } catch (error) {
-    return thunkAPI.rejectWithValue({ error })
+    return thunkAPI.rejectWithValue(error)
   }
 })
+
+export const updateMe = createAsyncThunk<AccountResType, UpdateMeBodyType>(
+  'accounts/updateMe',
+  async (body: UpdateMeBodyType, thunkAPI) => {
+    try {
+      const res = await accountApi.updateMeRequest(body)
+      return res.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
 
 export const uploadImage = createAsyncThunk<UploadImageResType, FormData>(
   'media/upload',

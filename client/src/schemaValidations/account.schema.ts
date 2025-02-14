@@ -89,8 +89,8 @@ export type UpdateMeBodyType = z.TypeOf<typeof UpdateMeBody>
 export const ChangePasswordBody = z
   .object({
     oldPassword: z.string().min(6).max(100),
-    password: z.string().min(6).max(100),
-    confirmPassword: z.string().min(6).max(100)
+    password: z.string().min(6, 'Mật khẩu cần tối thiểu 6 kí tự.').max(100),
+    confirmPassword: z.string().min(6, 'Mật khẩu cần tối thiểu 6 kí tự.').max(100)
   })
   .strict()
   .superRefine(({ confirmPassword, password }, ctx) => {
