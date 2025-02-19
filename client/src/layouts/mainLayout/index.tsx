@@ -14,11 +14,17 @@ export default function MainLayout() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  // const refreshToken = getRefreshTokenFromLS()
+  // const handleLogout = (refreshToken: string) => {
+  //   dispatch(logout({ refreshToken }))
+  //   clearLS()
+  //   navigate('/login', { state: { from: pathname } })
+  // }
   useEffect(() => {
     if (UNAUTHORIZED_ROUTES.includes(pathname)) {
       return
     }
-
+    // console.log('auth', auth)
     if (!auth?.isLoggedIn) {
       console.log('navigate to /login from ', pathname)
       navigate('/login', { state: { from: pathname } })
@@ -32,6 +38,10 @@ export default function MainLayout() {
       }
     }
     dispatch(getMe())
+      .unwrap()
+      .catch((error) => {
+        console.log(error)
+      })
   }, [auth, navigate, pathname, dispatch])
 
   return (
