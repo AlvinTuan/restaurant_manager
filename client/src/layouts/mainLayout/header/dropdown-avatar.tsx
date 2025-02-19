@@ -15,7 +15,7 @@ import { Link } from 'react-router'
 
 export default function DropdownAvatar() {
   const dispatch = useAppDispatch()
-  const refresh_token = getRefreshTokenFromLS()
+  const refreshToken = getRefreshTokenFromLS()
   const { account } = useAppSelector((state) => state.account)
 
   const handleLogout = (refreshToken: string) => {
@@ -46,7 +46,7 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleLogout(refresh_token)}>Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLogout(refreshToken)}>Đăng xuất</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -15,7 +15,6 @@ export default function LoginForm() {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
   const auth = useAppSelector((state) => state.auth)
-  console.log('auth', auth)
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
