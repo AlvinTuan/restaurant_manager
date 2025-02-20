@@ -3,7 +3,7 @@ import LoginForm from '@/pages/login/components/login-form'
 import NavItems from '@/pages/login/nav-items'
 import { useAppSelector } from '@/redux/hook'
 import { Package2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 export default function Login() {
@@ -38,7 +38,9 @@ export default function Login() {
         </header>
         <main className='flex items-center justify-center'>
           <div className='max-w-[350px] w-full top-1/2 translate-y-1/2'>
-            <LoginForm />
+            <Suspense>
+              <LoginForm />
+            </Suspense>
           </div>
         </main>
       </div>

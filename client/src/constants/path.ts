@@ -3,5 +3,6 @@ export enum path {
   login = '/login',
   logout = '/logout',
   profile = '/manage/dashboard',
-  manageSetting = '/manage/setting'
+  manageSetting = '/manage/setting',
+  manageAccounts = '/manage/accounts'
 }
