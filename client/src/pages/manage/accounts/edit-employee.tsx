@@ -32,7 +32,7 @@ export default function EditEmployee({
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
   const dispatch = useAppDispatch()
-  const { employeeCurrent } = useAppSelector((state) => state.account)
+  const { editingEmployee } = useAppSelector((state) => state.account)
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -87,8 +87,8 @@ export default function EditEmployee({
   }
 
   useEffect(() => {
-    if (employeeCurrent) {
-      const { name, avatar, email } = employeeCurrent
+    if (editingEmployee) {
+      const { name, avatar, email } = editingEmployee
       form.reset({
         name,
         avatar: avatar ?? undefined,
@@ -98,7 +98,7 @@ export default function EditEmployee({
         confirmPassword: form.getValues('confirmPassword')
       })
     }
-  }, [employeeCurrent, form])
+  }, [editingEmployee, form])
 
   const reset = () => {
     setId(undefined)

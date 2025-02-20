@@ -8,26 +8,32 @@ import {
   UpdateMeBodyType
 } from '@/schemaValidations/account.schema'
 import { UploadImageResType } from '@/schemaValidations/media.schema'
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface AccountState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   account: AccountResType['data'] | null
   employeeList: AccountListResType['data']
-  employeeCurrent: AccountResType['data'] | null
+  editingEmployee: AccountResType['data'] | null
 }
 
 const initialState: AccountState = {
   status: 'idle',
   account: null,
   employeeList: [],
-  employeeCurrent: null
+  editingEmployee: null
 }
 
 export const accountSlice = createSlice({
   name: 'account',
   initialState,
-  reducers: {},
+  reducers: {
+    startEditEmployee(state, action: PayloadAction<number>) {
+      const employeeId = action.payload
+      const foundEmployee = state.employeeList.find((employee) => employee.id === employeeId) || null
+      state.editingEmployee = foundEmployee
+    }
+  },
   extraReducers(builder) {
     builder
       .addCase(getMe.fulfilled, (state, action) => {
@@ -54,7 +60,7 @@ export const accountSlice = createSlice({
       })
       .addCase(updateEmployee.fulfilled, (state, action) => {
         state.employeeList.find((account, index) => {
-          if (account.id === action.meta.arg.id) {
+          if (account.id === action.payload.data.id) {
             state.employeeList[index] = action.payload.data
             return true
           }
@@ -63,7 +69,14 @@ export const accountSlice = createSlice({
       })
       .addCase(getEmployee.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.employeeCurrent = action.payload.data
+        state.editingEmployee = null
+      })
+      .addCase(deleteEmployee.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        const findIndexEmployee = state.employeeList.findIndex((employee) => employee.id === action.meta.arg)
+        if (findIndexEmployee !== -1) {
+          state.employeeList.splice(findIndexEmployee, 1)
+        }
       })
   }
 })
@@ -154,3 +167,5 @@ export const deleteEmployee = createAsyncThunk<AccountResType, number>(
     }
   }
 )
+
+export const { startEditEmployee } = accountSlice.actions

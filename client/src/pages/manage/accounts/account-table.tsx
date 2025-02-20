@@ -37,10 +37,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useToast } from '@/hooks/use-toast'
 import AddEmployee from '@/pages/manage/accounts/add-employee'
 import EditEmployee from '@/pages/manage/accounts/edit-employee'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { getAccountList } from '@/redux/slice/accountSlice'
+import { deleteEmployee, getAccountList, startEditEmployee } from '@/redux/slice/accountSlice'
 import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
 import { handleErrorApi } from '@/utils/utils'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -99,8 +100,10 @@ export const columns: ColumnDef<AccountType>[] = [
     enableHiding: false,
     cell: function Actions({ row }) {
       const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext)
+      const dispatch = useAppDispatch()
       const openEditEmployee = () => {
         setEmployeeIdEdit(row.original.id)
+        dispatch(startEditEmployee(row.original.id))
       }
 
       const openDeleteEmployee = () => {
@@ -133,6 +136,25 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }) {
+  const dispatch = useAppDispatch()
+  const { toast } = useToast()
+  const deleteAccount = async () => {
+    if (employeeDelete) {
+      try {
+        console.log('delete')
+        await dispatch(deleteEmployee(employeeDelete.id))
+          .unwrap()
+          .then((res) => {
+            toast({
+              description: res.message
+            })
+          })
+        setEmployeeDelete(null)
+      } catch (error) {
+        handleErrorApi({ error })
+      }
+    }
+  }
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
@@ -152,7 +174,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteAccount}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

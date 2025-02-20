@@ -31,7 +31,7 @@ const accountApi = {
     return http.get<AccountResType>(`accounts/detail/${id}`)
   },
   deleteEmployeeRequest(id: number) {
-    return http.get<AccountResType>(`accounts/detail/${id}`)
+    return http.delete<AccountResType>(`accounts/detail/${id}`)
   }
 }
 
