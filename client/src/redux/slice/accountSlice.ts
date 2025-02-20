@@ -67,7 +67,7 @@ export const accountSlice = createSlice({
           return false
         })
       })
-      .addCase(getEmployee.fulfilled, (state, action) => {
+      .addCase(getEmployee.fulfilled, (state, _action) => {
         state.status = 'succeeded'
         state.editingEmployee = null
       })
