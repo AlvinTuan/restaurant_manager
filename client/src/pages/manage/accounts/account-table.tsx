@@ -39,7 +39,10 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import AddEmployee from '@/pages/manage/accounts/add-employee'
 import EditEmployee from '@/pages/manage/accounts/edit-employee'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { getAccountList } from '@/redux/slice/accountSlice'
 import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
+import { handleErrorApi } from '@/utils/utils'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
@@ -164,7 +167,9 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  const dispatch = useAppDispatch()
+  const { accounts } = useAppSelector((state) => state.account)
+  const data: any[] = accounts
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -195,6 +200,14 @@ export default function AccountTable() {
       pagination
     }
   })
+
+  useEffect(() => {
+    dispatch(getAccountList())
+      .unwrap()
+      .catch((error) => {
+        handleErrorApi({ error })
+      })
+  }, [dispatch])
 
   useEffect(() => {
     table.setPagination({

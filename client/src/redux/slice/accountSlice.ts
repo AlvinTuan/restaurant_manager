@@ -13,11 +13,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 export interface AccountState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   account: AccountResType['data'] | null
+  accounts: AccountListResType['data']
 }
 
 const initialState: AccountState = {
   status: 'idle',
-  account: null
+  account: null,
+  accounts: []
 }
 
 export const accountSlice = createSlice({
@@ -39,6 +41,10 @@ export const accountSlice = createSlice({
       .addCase(updateMe.fulfilled, (state, action) => {
         state.status = 'succeeded'
         state.account = action.payload.data
+      })
+      .addCase(getAccountList.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.accounts = action.payload.data
       })
   }
 })
