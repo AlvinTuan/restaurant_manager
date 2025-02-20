@@ -1,6 +1,12 @@
 import accountApi from '@/apiRequests/account.api'
 import { mediaRequest } from '@/apiRequests/media.api'
-import { AccountResType, UpdateMeBodyType } from '@/schemaValidations/account.schema'
+import {
+  AccountListResType,
+  AccountResType,
+  CreateEmployeeAccountBodyType,
+  UpdateEmployeeAccountBodyType,
+  UpdateMeBodyType
+} from '@/schemaValidations/account.schema'
 import { UploadImageResType } from '@/schemaValidations/media.schema'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
@@ -66,6 +72,60 @@ export const uploadImage = createAsyncThunk<UploadImageResType, FormData>(
       return res.data
     } catch (error) {
       return thunkAPI.rejectWithValue({ error })
+    }
+  }
+)
+
+export const getAccountList = createAsyncThunk<AccountListResType>('accounts/getAccountList', async (_, thunkAPI) => {
+  try {
+    const res = await accountApi.getListRequest()
+    return res.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const addEmployee = createAsyncThunk<AccountResType, CreateEmployeeAccountBodyType>(
+  'accounts/addEmployee',
+  async (body, thunkAPI) => {
+    try {
+      const res = await accountApi.addEmployeeRequest(body)
+      return res.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
+export const updateEmployee = createAsyncThunk<AccountResType, { body: UpdateEmployeeAccountBodyType; id: number }>(
+  'accounts/updateEmployee',
+  async ({ id, body }, thunkAPI) => {
+    try {
+      const res = await accountApi.updateEmployeeRequest(id, body)
+      return res.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
+export const getEmployee = createAsyncThunk<AccountResType, number>('accounts/getEmployee', async (id, thunkAPI) => {
+  try {
+    const res = await accountApi.getEmployeeRequest(id)
+    return res.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const deleteEmployee = createAsyncThunk<AccountResType, number>(
+  'accounts/deleteEmployee',
+  async (id, thunkAPI) => {
+    try {
+      const res = await accountApi.deleteEmployeeRequest(id)
+      return res.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
     }
   }
 )

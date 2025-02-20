@@ -130,3 +130,7 @@ Tài khoản user:
 - buianhson@gmail.com | 123123
 - ngocbichhuynh@gmail.com | 123123
 - binhnguyen@gmail.com | 123123
+
+add
+
+- vanan@gmail.com | 123123
