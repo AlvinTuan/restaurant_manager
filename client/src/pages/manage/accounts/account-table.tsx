@@ -168,8 +168,8 @@ export default function AccountTable() {
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
   const dispatch = useAppDispatch()
-  const { accounts } = useAppSelector((state) => state.account)
-  const data: any[] = accounts
+  const { employeeList } = useAppSelector((state) => state.account)
+  const data: any[] = employeeList
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -219,7 +219,7 @@ export default function AccountTable() {
   return (
     <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
       <div className='w-full'>
-        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => {}} />
+        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} />
         <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
         <div className='flex items-center py-4'>
           <Input

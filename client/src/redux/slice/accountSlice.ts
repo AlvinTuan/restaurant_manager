@@ -13,13 +13,15 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 export interface AccountState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   account: AccountResType['data'] | null
-  accounts: AccountListResType['data']
+  employeeList: AccountListResType['data']
+  employeeCurrent: AccountResType['data'] | null
 }
 
 const initialState: AccountState = {
   status: 'idle',
   account: null,
-  accounts: []
+  employeeList: [],
+  employeeCurrent: null
 }
 
 export const accountSlice = createSlice({
@@ -44,11 +46,24 @@ export const accountSlice = createSlice({
       })
       .addCase(getAccountList.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.accounts = action.payload.data
+        state.employeeList = action.payload.data
       })
       .addCase(addEmployee.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.accounts.unshift(action.payload.data)
+        state.employeeList.unshift(action.payload.data)
+      })
+      .addCase(updateEmployee.fulfilled, (state, action) => {
+        state.employeeList.find((account, index) => {
+          if (account.id === action.meta.arg.id) {
+            state.employeeList[index] = action.payload.data
+            return true
+          }
+          return false
+        })
+      })
+      .addCase(getEmployee.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.employeeCurrent = action.payload.data
       })
   }
 })
@@ -107,9 +122,9 @@ export const addEmployee = createAsyncThunk<AccountResType, CreateEmployeeAccoun
   }
 )
 
-export const updateEmployee = createAsyncThunk<AccountResType, { body: UpdateEmployeeAccountBodyType; id: number }>(
+export const updateEmployee = createAsyncThunk(
   'accounts/updateEmployee',
-  async ({ id, body }, thunkAPI) => {
+  async ({ id, body }: { id: number; body: UpdateEmployeeAccountBodyType }, thunkAPI) => {
     try {
       const res = await accountApi.updateEmployeeRequest(id, body)
       return res.data

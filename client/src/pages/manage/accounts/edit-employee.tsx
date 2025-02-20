@@ -13,10 +13,13 @@ import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { getEmployee, updateEmployee, uploadImage } from '@/redux/slice/accountSlice'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
+import { handleErrorApi } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export default function EditEmployee({
@@ -25,10 +28,11 @@ export default function EditEmployee({
 }: {
   id?: number | undefined
   setId: (value: number | undefined) => void
-  onSubmitSuccess?: () => void
 }) {
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const dispatch = useAppDispatch()
+  const { employeeCurrent } = useAppSelector((state) => state.account)
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -50,6 +54,57 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
+  // startEditingEmployee
+  useEffect(() => {
+    if (id) {
+      dispatch(getEmployee(id))
+        .unwrap()
+        .catch((error) => {
+          handleErrorApi({ error })
+        })
+    }
+  }, [dispatch, id])
+
+  // finishEditEmployee
+  const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
+    try {
+      let body = values
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const imageUrl = uploadImageRes.data
+        body = {
+          ...values,
+          avatar: imageUrl
+        }
+      }
+      dispatch(updateEmployee({ id: id as number, body }))
+      reset()
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
+
+  useEffect(() => {
+    if (employeeCurrent) {
+      const { name, avatar, email } = employeeCurrent
+      form.reset({
+        name,
+        avatar: avatar ?? undefined,
+        email,
+        changePassword: form.getValues('changePassword'),
+        password: form.getValues('password'),
+        confirmPassword: form.getValues('confirmPassword')
+      })
+    }
+  }, [employeeCurrent, form])
+
+  const reset = () => {
+    setId(undefined)
+    setFile(null)
+  }
+
   return (
     <Dialog
       open={Boolean(id)}
@@ -65,7 +120,12 @@ export default function EditEmployee({
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid items-start gap-4 auto-rows-max md:gap-8' id='edit-employee-form'>
+          <form
+            noValidate
+            className='grid items-start gap-4 auto-rows-max md:gap-8'
+            id='edit-employee-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
