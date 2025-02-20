@@ -46,6 +46,10 @@ export const accountSlice = createSlice({
         state.status = 'succeeded'
         state.accounts = action.payload.data
       })
+      .addCase(addEmployee.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.accounts.unshift(action.payload.data)
+      })
   }
 })
 
