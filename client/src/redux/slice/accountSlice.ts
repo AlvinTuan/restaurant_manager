@@ -66,11 +66,11 @@ export const accountSlice = createSlice({
           }
           return false
         })
-      })
-      .addCase(getEmployee.fulfilled, (state, _action) => {
-        state.status = 'succeeded'
         state.editingEmployee = null
       })
+      // .addCase(getEmployee.fulfilled, (state, _action) => {
+      //   state.status = 'succeeded'
+      // })
       .addCase(deleteEmployee.fulfilled, (state, action) => {
         state.status = 'succeeded'
         const findIndexEmployee = state.employeeList.findIndex((employee) => employee.id === action.meta.arg)

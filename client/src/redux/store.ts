@@ -1,5 +1,6 @@
 import { accountSlice } from '@/redux/slice/accountSlice'
 import { authSlice } from '@/redux/slice/authSlice'
+import { dishesSlice } from '@/redux/slice/dishesSlice'
 import { configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -11,11 +12,13 @@ const persistConfig = {
 
 const persistedAuthReducer = persistReducer(persistConfig, authSlice.reducer)
 const persistedAccountReducer = persistReducer(persistConfig, accountSlice.reducer)
+const persistedDishesReducer = persistReducer(persistConfig, dishesSlice.reducer)
 
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
-    account: persistedAccountReducer
+    account: persistedAccountReducer,
+    dishes: persistedDishesReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

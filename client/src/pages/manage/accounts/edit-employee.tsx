@@ -81,6 +81,7 @@ export default function EditEmployee({
       }
       dispatch(updateEmployee({ id: id as number, body }))
       reset()
+      setId(undefined)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }
