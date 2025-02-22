@@ -1,7 +1,7 @@
 import { path } from '@/constants/path'
+import { getRefreshTokenFromLS } from '@/lib/auth'
 import { useAppDispatch } from '@/redux/hook'
 import { logout } from '@/redux/slice/authSlice'
-import { getRefreshTokenFromLS } from '@/utils/auth'
 import { Link } from 'react-router'
 
 export default function Home() {

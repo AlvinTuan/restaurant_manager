@@ -1,3 +1,4 @@
+import http from '@/lib/http'
 import {
   AccountListResType,
   AccountResType,
@@ -6,7 +7,6 @@ import {
   UpdateEmployeeAccountBodyType,
   UpdateMeBodyType
 } from '@/schemaValidations/account.schema'
-import http from '@/utils/http'
 
 const accountApi = {
   meRequest(options?: { signal: AbortSignal }) {

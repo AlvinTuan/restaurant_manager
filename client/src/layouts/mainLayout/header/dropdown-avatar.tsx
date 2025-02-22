@@ -8,9 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { getRefreshTokenFromLS } from '@/lib/auth'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
 import { logout } from '@/redux/slice/authSlice'
-import { getRefreshTokenFromLS } from '@/utils/auth'
 import { Link } from 'react-router'
 
 export default function DropdownAvatar() {

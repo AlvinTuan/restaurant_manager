@@ -1,3 +1,4 @@
+import http, { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN } from '@/lib/http'
 import {
   LoginBodyType,
   LoginResType,
@@ -5,7 +6,6 @@ import {
   RefreshTokenBodyType,
   RefreshTokenResType
 } from '@/schemaValidations/auth.schema'
-import http, { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN } from '@/utils/http'
 
 const authApi = {
   loginRequest(body: LoginBodyType) {

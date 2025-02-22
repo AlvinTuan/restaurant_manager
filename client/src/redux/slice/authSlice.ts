@@ -1,4 +1,6 @@
 import authApi from '@/apiRequests/auth.api'
+import { getAccessTokenFromLS } from '@/lib/auth'
+import { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN } from '@/lib/http'
 import {
   LoginBodyType,
   LoginResType,
@@ -6,8 +8,6 @@ import {
   RefreshTokenBodyType,
   RefreshTokenResType
 } from '@/schemaValidations/auth.schema'
-import { getAccessTokenFromLS } from '@/utils/auth'
-import { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN } from '@/utils/http'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface AuthState {
