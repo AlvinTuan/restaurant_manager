@@ -1,20 +1,15 @@
 import { tableApiRequest } from '@/apiRequests/table.api'
-import {
-  CreateTableBodyType,
-  TableListResType,
-  TableResType,
-  UpdateTableBodyType
-} from '@/schemaValidations/table.schema'
+import { CreateTableBodyType, TableListResType, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export interface TableState {
   tables: TableListResType['data']
-  editingTable: TableResType['data'] | null
+  editTableId: number | null
 }
 
 export const initialState: TableState = {
   tables: [],
-  editingTable: null
+  editTableId: null
 }
 
 export const tablesSlice = createSlice({
@@ -28,6 +23,21 @@ export const tablesSlice = createSlice({
       })
       .addCase(addTable.fulfilled, (state, action) => {
         state.tables.unshift(action.payload.data)
+      })
+      .addCase(updateTable.fulfilled, (state, action) => {
+        state.tables.some((table, index) => {
+          if (table.number === action.payload.data.number) {
+            state.tables[index] = action.payload.data
+            return true
+          }
+          return false
+        })
+      })
+      .addCase(deleteTable.fulfilled, (state, action) => {
+        const findIndexTable = state.tables.findIndex((table) => table.number === action.meta.arg)
+        if (findIndexTable !== -1) {
+          state.tables.splice(findIndexTable, 1)
+        }
       })
   }
 })

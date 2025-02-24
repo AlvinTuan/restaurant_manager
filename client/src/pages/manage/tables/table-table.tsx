@@ -14,6 +14,7 @@ import {
 } from '@tanstack/react-table'
 
 import AutoPagination from '@/components/auto-pagination'
+import QRCodeTable from '@/components/qrcode-table'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,13 +35,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useToast } from '@/hooks/use-toast'
 import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import AddTable from '@/pages/manage/tables/add-table'
 import EditTable from '@/pages/manage/tables/edit-table'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { getTables } from '@/redux/slice/tablesSlice'
-import { TableListResType } from '@/schemaValidations/table.schema'
+import { addTable, deleteTable, getTables, updateTable } from '@/redux/slice/tablesSlice'
+import { CreateTableBodyType, TableListResType, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { UseFormSetError } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
 
 type TableItem = TableListResType['data'][0]
@@ -76,7 +79,11 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'token',
     header: 'QR Code',
-    cell: ({ row }) => <div>{row.getValue('number')}</div>
+    cell: ({ row }) => (
+      <div>
+        <QRCodeTable token={row.getValue('token')} tableNumber={row.getValue('number')}></QRCodeTable>
+      </div>
+    )
   },
   {
     id: 'actions',
@@ -112,11 +119,18 @@ export const columns: ColumnDef<TableItem>[] = [
 
 function AlertDialogDeleteTable({
   tableDelete,
-  setTableDelete
+  setTableDelete,
+  handleDeleteTable
 }: {
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
+  handleDeleteTable: (id: number) => void
 }) {
+  const onDelete = () => {
+    handleDeleteTable(tableDelete!.number)
+    setTableDelete(null)
+  }
+
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -136,7 +150,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -162,6 +176,7 @@ export default function TableTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
+  const { toast } = useToast()
 
   const table = useReactTable({
     data,
@@ -198,11 +213,61 @@ export default function TableTable() {
       .catch((err) => handleErrorApi(err))
   }, [dispatch])
 
+  /**
+   * Add new table
+   * @param values
+   */
+  const handleAddTable = (values: CreateTableBodyType) => {
+    dispatch(addTable(values))
+      .unwrap()
+      .then((res) => {
+        toast({
+          description: res.message
+        })
+      })
+      .catch((error) => {
+        handleErrorApi({ error })
+      })
+  }
+
+  /**
+   * Update table
+   * @param values
+   */
+  const handleUpdateTable = (id: number, values: UpdateTableBodyType, formError?: UseFormSetError<any>) => {
+    dispatch(updateTable({ id, body: values }))
+      .unwrap()
+      .then((res) => {
+        toast({ description: res.message })
+      })
+      .catch((error) => {
+        handleErrorApi({ error, setError: formError })
+      })
+  }
+
+  /**
+   * Delete table
+   */
+  const handleDeleteTable = (id: number) => {
+    dispatch(deleteTable(id))
+      .unwrap()
+      .then((res) => {
+        toast({ description: res.message })
+      })
+      .catch((error) => {
+        handleErrorApi({ error })
+      })
+  }
+
   return (
     <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>
       <div className='w-full'>
-        <EditTable id={tableIdEdit} setId={setTableIdEdit} />
-        <AlertDialogDeleteTable tableDelete={tableDelete} setTableDelete={setTableDelete} />
+        <EditTable id={tableIdEdit} setId={setTableIdEdit} handleUpdateTable={handleUpdateTable} />
+        <AlertDialogDeleteTable
+          tableDelete={tableDelete}
+          setTableDelete={setTableDelete}
+          handleDeleteTable={handleDeleteTable}
+        />
         <div className='flex items-center py-4'>
           <Input
             placeholder='Lọc số bàn'
@@ -211,7 +276,7 @@ export default function TableTable() {
             className='max-w-sm'
           />
           <div className='flex items-center gap-2 ml-auto'>
-            <AddTable />
+            <AddTable handleAddTable={handleAddTable} />
           </div>
         </div>
         <div className='border rounded-md'>

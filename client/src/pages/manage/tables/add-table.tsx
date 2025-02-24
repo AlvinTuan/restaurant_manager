@@ -5,20 +5,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TableStatus, TableStatusValues } from '@/constants/type'
-import { useToast } from '@/hooks/use-toast'
-import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
-import { useAppDispatch } from '@/redux/hook'
-import { addTable } from '@/redux/slice/tablesSlice'
+import { getVietnameseTableStatus } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-export default function AddTable() {
+interface AddTableProps {
+  handleAddTable: (values: CreateTableBodyType) => void
+}
+
+export default function AddTable({ handleAddTable }: AddTableProps) {
   const [open, setOpen] = useState(false)
-  const dispatch = useAppDispatch()
-  const { toast } = useToast()
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -28,17 +27,13 @@ export default function AddTable() {
     }
   })
 
-  const onSubmit = (values: CreateTableBodyType) => {
-    dispatch(addTable(values))
-      .unwrap()
-      .then((res) => {
-        toast({
-          description: res.message
-        })
-      })
-      .catch((error) => {
-        handleErrorApi({ error })
-      })
+  const reset = () => {
+    form.reset()
+  }
+
+  const onAddTable = (values: CreateTableBodyType) => {
+    handleAddTable(values)
+    reset()
     setOpen(false)
   }
   return (
@@ -58,7 +53,7 @@ export default function AddTable() {
             noValidate
             className='grid items-start gap-4 auto-rows-max md:gap-8'
             id='add-table-form'
-            onSubmit={form.handleSubmit(onSubmit, (e) => console.log(e))}
+            onSubmit={form.handleSubmit(onAddTable, (e) => console.log(e))}
           >
             <div className='grid gap-4 py-4'>
               <FormField

@@ -6,19 +6,26 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { TableStatus, TableStatusValues } from '@/constants/type'
-import { getTableLink, getVietnameseTableStatus } from '@/lib/utils'
-import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
+import { getTableLink, getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
+import { useAppDispatch } from '@/redux/hook'
+import { getTableDetail } from '@/redux/slice/tablesSlice'
+import { TableResType, UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm, UseFormSetError } from 'react-hook-form'
 import { Link } from 'react-router'
 
 export default function EditTable({
   id,
-  setId
+  setId,
+  handleUpdateTable
 }: {
   id?: number | undefined
   setId: (value: number | undefined) => void
+  handleUpdateTable: (id: number, values: UpdateTableBodyType, formError?: UseFormSetError<any>) => void
 }) {
+  const [table, setTable] = useState<TableResType['data'] | null>(null)
+  const dispatch = useAppDispatch()
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
     defaultValues: {
@@ -28,6 +35,34 @@ export default function EditTable({
     }
   })
   const tableNumber = 0
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getTableDetail(id))
+        .unwrap()
+        .then((res) => {
+          setTable(res.data)
+        })
+        .catch((error) => {
+          handleErrorApi({ error, setError: form.setError })
+        })
+    }
+  }, [dispatch, form.setError, id])
+
+  useEffect(() => {
+    if (table) {
+      form.reset({
+        capacity: table.capacity,
+        status: table.status,
+        changeToken: form.getValues('changeToken')
+      })
+    }
+  }, [dispatch, form, table])
+
+  const onEditTable = (values: UpdateTableBodyType) => {
+    handleUpdateTable(id!, values, form.setError)
+    setId(undefined)
+  }
 
   return (
     <Dialog
@@ -46,20 +81,16 @@ export default function EditTable({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Cập nhật bàn ăn</DialogTitle>
+          <DialogTitle>Cập nhật bàn ăn số {table?.number}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid items-start gap-4 auto-rows-max md:gap-8' id='edit-table-form'>
+          <form
+            noValidate
+            className='grid items-start gap-4 auto-rows-max md:gap-8'
+            id='edit-table-form'
+            onSubmit={form.handleSubmit(onEditTable)}
+          >
             <div className='grid gap-4 py-4'>
-              <FormItem>
-                <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
-                  <Label htmlFor='name'>Số hiệu bàn</Label>
-                  <div className='w-full col-span-3 space-y-2'>
-                    <Input id='number' type='number' className='w-full' value={tableNumber} readOnly />
-                    <FormMessage />
-                  </div>
-                </div>
-              </FormItem>
               <FormField
                 control={form.control}
                 name='capacity'
