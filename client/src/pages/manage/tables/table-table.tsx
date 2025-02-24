@@ -1,5 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
-import { CaretSortIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,9 +13,8 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button } from '@/components/ui/button'
-
 import AutoPagination from '@/components/auto-pagination'
+import QRCodeTable from '@/components/qrcode-table'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +25,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,79 +36,73 @@ import {
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
-import { handleErrorApi } from '@/lib/utils'
-import AddEmployee from '@/pages/manage/accounts/add-employee'
-import EditEmployee from '@/pages/manage/accounts/edit-employee'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
+import AddTable from '@/pages/manage/tables/add-table'
+import EditTable from '@/pages/manage/tables/edit-table'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { deleteEmployee, getAccountList, startEditEmployee } from '@/redux/slice/accountSlice'
-import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
+import { addTable, deleteTable, getTables, updateTable } from '@/redux/slice/tablesSlice'
+import { CreateTableBodyType, TableListResType, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { UseFormSetError } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
 
-type AccountItem = AccountListResType['data'][0]
+type TableItem = TableListResType['data'][0]
 
-const AccountTableContext = createContext<{
-  setEmployeeIdEdit: (value: number) => void
-  employeeIdEdit: number | undefined
-  employeeDelete: AccountItem | null
-  setEmployeeDelete: (value: AccountItem | null) => void
+const TableTableContext = createContext<{
+  setTableIdEdit: (value: number) => void
+  tableIdEdit: number | undefined
+  tableDelete: TableItem | null
+  setTableDelete: (value: TableItem | null) => void
 }>({
-  setEmployeeIdEdit: (_value: number | undefined) => {},
-  employeeIdEdit: undefined,
-  employeeDelete: null,
-  setEmployeeDelete: (_value: AccountItem | null) => {}
+  setTableIdEdit: (value: number | undefined) => {},
+  tableIdEdit: undefined,
+  tableDelete: null,
+  setTableDelete: (value: TableItem | null) => {}
 })
 
-export const columns: ColumnDef<AccountType>[] = [
+export const columns: ColumnDef<TableItem>[] = [
   {
-    accessorKey: 'id',
-    header: 'ID'
+    accessorKey: 'number',
+    header: 'Số bàn',
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('number')}</div>,
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return false
+      return String(row.getValue('number')) === String(filterValue)
+    }
   },
   {
-    accessorKey: 'avatar',
-    header: 'Avatar',
+    accessorKey: 'capacity',
+    header: 'Sức chứa',
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('capacity')}</div>
+  },
+  {
+    accessorKey: 'status',
+    header: 'Trạng thái',
+    cell: ({ row }) => <div>{getVietnameseTableStatus(row.getValue('status'))}</div>
+  },
+  {
+    accessorKey: 'token',
+    header: 'QR Code',
     cell: ({ row }) => (
       <div>
-        <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
-          <AvatarImage src={row.getValue('avatar')} />
-          <AvatarFallback className='rounded-none'>{row.original.name}</AvatarFallback>
-        </Avatar>
+        <QRCodeTable token={row.getValue('token')} tableNumber={row.getValue('number')}></QRCodeTable>
       </div>
     )
-  },
-  {
-    accessorKey: 'name',
-    header: 'Tên',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('name')}</div>
-  },
-  {
-    accessorKey: 'email',
-    header: ({ column }) => {
-      return (
-        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Email
-          <CaretSortIcon className='w-4 h-4 ml-2' />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: function Actions({ row }) {
-      const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext)
-      const dispatch = useAppDispatch()
-      const openEditEmployee = () => {
-        setEmployeeIdEdit(row.original.id)
-        dispatch(startEditEmployee(row.original.id))
+      const { setTableIdEdit, setTableDelete } = useContext(TableTableContext)
+      const openEditTable = () => {
+        setTableIdEdit(row.original.number)
       }
 
-      const openDeleteEmployee = () => {
-        setEmployeeDelete(row.original)
+      const openDeleteTable = () => {
+        setTableDelete(row.original)
       }
       return (
-        <DropdownMenu modal={false}>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' className='w-8 h-8 p-0'>
               <span className='sr-only'>Open menu</span>
@@ -120,8 +112,8 @@ export const columns: ColumnDef<AccountType>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={openEditEmployee}>Sửa</DropdownMenuItem>
-            <DropdownMenuItem onClick={openDeleteEmployee}>Xóa</DropdownMenuItem>
+            <DropdownMenuItem onClick={openEditTable}>Sửa</DropdownMenuItem>
+            <DropdownMenuItem onClick={openDeleteTable}>Xóa</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -129,51 +121,40 @@ export const columns: ColumnDef<AccountType>[] = [
   }
 ]
 
-function AlertDialogDeleteAccount({
-  employeeDelete,
-  setEmployeeDelete
+function AlertDialogDeleteTable({
+  tableDelete,
+  setTableDelete,
+  handleDeleteTable
 }: {
-  employeeDelete: AccountItem | null
-  setEmployeeDelete: (value: AccountItem | null) => void
+  tableDelete: TableItem | null
+  setTableDelete: (value: TableItem | null) => void
+  handleDeleteTable: (id: number) => void
 }) {
-  const dispatch = useAppDispatch()
-  const { toast } = useToast()
-  const deleteAccount = async () => {
-    if (employeeDelete) {
-      try {
-        await dispatch(deleteEmployee(employeeDelete.id))
-          .unwrap()
-          .then((res) => {
-            toast({
-              description: res.message
-            })
-          })
-        setEmployeeDelete(null)
-      } catch (error) {
-        handleErrorApi({ error })
-      }
-    }
+  const onDelete = () => {
+    handleDeleteTable(tableDelete!.number)
+    setTableDelete(null)
   }
+
   return (
     <AlertDialog
-      open={Boolean(employeeDelete)}
+      open={Boolean(tableDelete)}
       onOpenChange={(value) => {
         if (!value) {
-          setEmployeeDelete(null)
+          setTableDelete(null)
         }
       }}
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa nhân viên?</AlertDialogTitle>
+          <AlertDialogTitle>Xóa bàn ăn?</AlertDialogTitle>
           <AlertDialogDescription>
-            Tài khoản <span className='px-1 rounded bg-foreground text-primary-foreground'>{employeeDelete?.name}</span>{' '}
-            sẽ bị xóa vĩnh viễn
+            Bàn <span className='px-1 rounded bg-foreground text-primary-foreground'>{tableDelete?.number}</span> sẽ bị
+            xóa vĩnh viễn
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={deleteAccount}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -181,16 +162,16 @@ function AlertDialogDeleteAccount({
 }
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
-export default function AccountTable() {
+export default function TableTable() {
   const [searchParam] = useSearchParams()
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
-  const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
-  const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
+  const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
+  const [tableDelete, setTableDelete] = useState<TableItem | null>(null)
   const dispatch = useAppDispatch()
-  const { employeeList } = useAppSelector((state) => state.account)
-  const data: any[] = employeeList
+  const { tables } = useAppSelector((state) => state.tables)
+  const data: any[] = tables
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -199,6 +180,7 @@ export default function AccountTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
+  const { toast } = useToast()
 
   const table = useReactTable({
     data,
@@ -223,34 +205,82 @@ export default function AccountTable() {
   })
 
   useEffect(() => {
-    dispatch(getAccountList())
-      .unwrap()
-      .catch((error) => {
-        handleErrorApi({ error })
-      })
-  }, [dispatch])
-
-  useEffect(() => {
     table.setPagination({
       pageIndex,
       pageSize: PAGE_SIZE
     })
   }, [table, pageIndex])
 
+  useEffect(() => {
+    dispatch(getTables())
+      .unwrap()
+      .catch((err) => handleErrorApi(err))
+  }, [dispatch])
+
+  /**
+   * Add new table
+   * @param values
+   */
+  const handleAddTable = (values: CreateTableBodyType) => {
+    dispatch(addTable(values))
+      .unwrap()
+      .then((res) => {
+        toast({
+          description: res.message
+        })
+      })
+      .catch((error) => {
+        handleErrorApi({ error })
+      })
+  }
+
+  /**
+   * Update table
+   * @param values
+   */
+  const handleUpdateTable = (id: number, values: UpdateTableBodyType, formError?: UseFormSetError<any>) => {
+    dispatch(updateTable({ id, body: values }))
+      .unwrap()
+      .then((res) => {
+        toast({ description: res.message })
+      })
+      .catch((error) => {
+        handleErrorApi({ error, setError: formError })
+      })
+  }
+
+  /**
+   * Delete table
+   */
+  const handleDeleteTable = (id: number) => {
+    dispatch(deleteTable(id))
+      .unwrap()
+      .then((res) => {
+        toast({ description: res.message })
+      })
+      .catch((error) => {
+        handleErrorApi({ error })
+      })
+  }
+
   return (
-    <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
+    <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>
       <div className='w-full'>
-        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} />
-        <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
+        <EditTable id={tableIdEdit} setId={setTableIdEdit} handleUpdateTable={handleUpdateTable} />
+        <AlertDialogDeleteTable
+          tableDelete={tableDelete}
+          setTableDelete={setTableDelete}
+          handleDeleteTable={handleDeleteTable}
+        />
         <div className='flex items-center py-4'>
           <Input
-            placeholder='Filter emails...'
-            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
+            placeholder='Lọc số bàn'
+            value={(table.getColumn('number')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('number')?.setFilterValue(event.target.value)}
             className='max-w-sm'
           />
           <div className='flex items-center gap-2 ml-auto'>
-            <AddEmployee />
+            <AddTable handleAddTable={handleAddTable} />
           </div>
         </div>
         <div className='border rounded-md'>
@@ -296,11 +326,11 @@ export default function AccountTable() {
             <AutoPagination
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getPageCount()}
-              pathname='/manage/accounts'
+              pathname='/manage/tables'
             />
           </div>
         </div>
       </div>
-    </AccountTableContext.Provider>
+    </TableTableContext.Provider>
   )
 }

@@ -1,11 +1,11 @@
-import { LoginResType, RefreshTokenResType } from '@/schemaValidations/auth.schema'
 import {
   clearLS,
   getAccessTokenFromLS,
   getRefreshTokenFromLS,
   setAccessTokenToLS,
   setRefreshTokenToLS
-} from '@/utils/auth'
+} from '@/lib/auth'
+import { LoginResType, RefreshTokenResType } from '@/schemaValidations/auth.schema'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 enum HttpStatus {

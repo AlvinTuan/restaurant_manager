@@ -1,5 +1,5 @@
+import http from '@/lib/http'
 import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } from '@/schemaValidations/dish.schema'
-import http from '@/utils/http'
 
 export const dishApiRequest = {
   list: () => http.get<DishListResType>('dishes'),
