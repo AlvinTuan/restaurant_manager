@@ -1,3 +1,4 @@
+import QRCodeTable from '@/components/qrcode-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -91,6 +92,15 @@ export default function EditTable({
             onSubmit={form.handleSubmit(onEditTable)}
           >
             <div className='grid gap-4 py-4'>
+              <FormItem>
+                <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
+                  <Label htmlFor='name'>Số hiệu bàn</Label>
+                  <div className='w-full col-span-3 space-y-2'>
+                    <Input id='number' type='number' className='w-full' value={table?.number ?? 0} readOnly />
+                    <FormMessage />
+                  </div>
+                </div>
+              </FormItem>
               <FormField
                 control={form.control}
                 name='capacity'
@@ -141,13 +151,12 @@ export default function EditTable({
                 render={({ field }) => (
                   <FormItem>
                     <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
-                      <Label htmlFor='price'>Đổi QR Code</Label>
+                      <Label htmlFor='price'>Đổi QR Code & URL</Label>
                       <div className='w-full col-span-3 space-y-2'>
                         <div className='flex items-center space-x-2'>
                           <Switch id='changeToken' checked={field.value} onCheckedChange={field.onChange} />
                         </div>
                       </div>
-
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -156,26 +165,30 @@ export default function EditTable({
               <FormItem>
                 <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
                   <Label>QR Code</Label>
-                  <div className='w-full col-span-3 space-y-2'></div>
+                  <div className='w-full col-span-3 space-y-2'>
+                    {table && <QRCodeTable token={table.token} tableNumber={table.number}></QRCodeTable>}
+                  </div>
                 </div>
               </FormItem>
               <FormItem>
                 <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
                   <Label>URL gọi món</Label>
                   <div className='w-full col-span-3 space-y-2'>
-                    <Link
-                      to={getTableLink({
-                        token: '123123123',
-                        tableNumber: tableNumber
-                      })}
-                      target='_blank'
-                      className='break-all'
-                    >
-                      {getTableLink({
-                        token: '123123123',
-                        tableNumber: tableNumber
-                      })}
-                    </Link>
+                    {table && (
+                      <Link
+                        to={getTableLink({
+                          token: table.token,
+                          tableNumber: table.number
+                        })}
+                        target='_blank'
+                        className='break-all'
+                      >
+                        {getTableLink({
+                          token: table.token,
+                          tableNumber: table.number
+                        })}
+                      </Link>
+                    )}
                   </div>
                 </div>
               </FormItem>
