@@ -17,14 +17,6 @@ export const URL_LOGIN = 'auth/login'
 export const URL_LOGOUT = 'auth/logout'
 export const URL_REFRESH_TOKEN = '/auth/refresh-token'
 
-type EntityErrorPayload = {
-  message: string
-  errors: {
-    field: string
-    message: string
-  }[]
-}
-
 export class HttpError extends Error {
   status: number
   payload: {
@@ -38,6 +30,13 @@ export class HttpError extends Error {
   }
 }
 
+type EntityErrorPayload = {
+  message: string
+  errors: {
+    field: string
+    message: string
+  }[]
+}
 export class EntityError extends HttpError {
   status: typeof HttpStatus.ENTITY_ERROR_STATUS
   payload: EntityErrorPayload

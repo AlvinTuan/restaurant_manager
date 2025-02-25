@@ -8,22 +8,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { path } from '@/constants/path'
 import { getRefreshTokenFromLS } from '@/lib/auth'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { logout } from '@/redux/slice/authSlice'
-import { Link } from 'react-router'
+import { handleErrorApi } from '@/lib/utils'
+import { useLogoutMutation } from '@/pages/login/auth.service'
+import { useAppSelector } from '@/redux/hook'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 export default function DropdownAvatar() {
-  const dispatch = useAppDispatch()
   const refreshToken = getRefreshTokenFromLS()
-  const { account } = useAppSelector((state) => state.account)
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const handleLogout = (refreshToken: string) => {
-    dispatch(
-      logout({
-        refreshToken
-      })
-    )
+  const { account } = useAppSelector((state) => state.account)
+  const [logout] = useLogoutMutation()
+
+  const onLogout = async (refreshToken: string) => {
+    try {
+      await logout({ refreshToken }).unwrap()
+      navigate(path.login, { state: { from: location.pathname } })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   return (
@@ -46,7 +52,7 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleLogout(refreshToken)}>Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onLogout(refreshToken)}>Đăng xuất</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
