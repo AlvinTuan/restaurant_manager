@@ -39,10 +39,9 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import { useDeleteEmployeeMutation, useGetEmployeesQuery } from '@/pages/manage/accounts/account.service'
 import AddEmployee from '@/pages/manage/accounts/add-employee'
 import EditEmployee from '@/pages/manage/accounts/edit-employee'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { deleteEmployee, getAccountList, startEditEmployee } from '@/redux/slice/accountSlice'
 import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
@@ -100,10 +99,8 @@ export const columns: ColumnDef<AccountType>[] = [
     enableHiding: false,
     cell: function Actions({ row }) {
       const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext)
-      const dispatch = useAppDispatch()
       const openEditEmployee = () => {
         setEmployeeIdEdit(row.original.id)
-        dispatch(startEditEmployee(row.original.id))
       }
 
       const openDeleteEmployee = () => {
@@ -136,17 +133,15 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }) {
-  const dispatch = useAppDispatch()
+  const [deleteAccountMutation] = useDeleteEmployeeMutation()
   const { toast } = useToast()
-  const deleteAccount = async () => {
+  const deleteAccount = () => {
     if (employeeDelete) {
       try {
-        await dispatch(deleteEmployee(employeeDelete.id))
+        deleteAccountMutation(employeeDelete.id)
           .unwrap()
           .then((res) => {
-            toast({
-              description: res.message
-            })
+            toast({ description: res.message })
           })
         setEmployeeDelete(null)
       } catch (error) {
@@ -188,9 +183,8 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const dispatch = useAppDispatch()
-  const { employeeList } = useAppSelector((state) => state.account)
-  const data: any[] = employeeList
+  const { data: employeeList, isFetching } = useGetEmployeesQuery()
+  const data: any[] = employeeList ? employeeList.data : []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -221,14 +215,6 @@ export default function AccountTable() {
       pagination
     }
   })
-
-  useEffect(() => {
-    dispatch(getAccountList())
-      .unwrap()
-      .catch((error) => {
-        handleErrorApi({ error })
-      })
-  }, [dispatch])
 
   useEffect(() => {
     table.setPagination({

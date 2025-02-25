@@ -79,12 +79,15 @@ class Http {
     // Add a request interceptor
     this.instance.interceptors.request.use(
       (config) => {
+        console.log(config)
         if (this.accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${this.accessToken}`
+          config.headers['Content-Type'] = config.data instanceof FormData ? undefined : 'application/json'
         }
         return config
       },
       function (error) {
+        console.log(error)
         return Promise.reject(error)
       }
     )

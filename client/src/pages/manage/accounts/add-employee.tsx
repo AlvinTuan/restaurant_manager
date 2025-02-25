@@ -14,9 +14,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useAppDispatch } from '@/redux/hook'
-import { addEmployee, uploadImage } from '@/redux/slice/accountSlice'
+import { useAddEmployeeMutation } from '@/pages/manage/accounts/account.service'
 import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
+import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle, Upload } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
@@ -26,7 +26,8 @@ export default function AddEmployee() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
-  const dispatch = useAppDispatch()
+  const [uploadImage] = useUploadImageMutation()
+  const [addEmployee] = useAddEmployeeMutation()
   const { toast } = useToast()
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
@@ -59,14 +60,14 @@ export default function AddEmployee() {
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const uploadImageRes = await uploadImage(formData).unwrap()
         const imageUrl = uploadImageRes.data
         body = {
           ...values,
           avatar: imageUrl
         }
       }
-      dispatch(addEmployee(body))
+      addEmployee(body)
         .unwrap()
         .then((res) => {
           toast({ description: res.message })

@@ -1,9 +1,10 @@
 import { authApi } from '@/pages/login/auth.service'
 import authReducer from '@/pages/login/auth.slice'
+import { accountApi } from '@/pages/manage/accounts/account.service'
 import { rtkQueryErrorLogger } from '@/redux/middleware'
-import { accountSlice } from '@/redux/slice/accountSlice'
 import { dishesSlice } from '@/redux/slice/dishesSlice'
 import { tablesSlice } from '@/redux/slice/tablesSlice'
+import { mediaApi } from '@/services/media.service'
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 
@@ -33,13 +34,19 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    account: accountSlice.reducer,
     dishes: dishesSlice.reducer,
     tables: tablesSlice.reducer,
-    [authApi.reducerPath]: authApi.reducer
+    [authApi.reducerPath]: authApi.reducer,
+    [accountApi.reducerPath]: accountApi.reducer,
+    [mediaApi.reducerPath]: mediaApi.reducer
   },
   middleware(getDefaultMiddleware) {
-    return getDefaultMiddleware().concat(authApi.middleware, rtkQueryErrorLogger)
+    return getDefaultMiddleware().concat(
+      authApi.middleware,
+      accountApi.middleware,
+      mediaApi.middleware,
+      rtkQueryErrorLogger
+    )
   }
 })
 
