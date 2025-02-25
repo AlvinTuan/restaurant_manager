@@ -16,10 +16,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { DishStatus, DishStatusValues } from '@/constants/type'
 import { useToast } from '@/hooks/use-toast'
 import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { uploadImage } from '@/redux/slice/accountSlice'
-import { updateDish } from '@/redux/slice/dishesSlice'
+import { useEditDishMutation, useGetDishQuery } from '@/pages/manage/dishes/dishes.service'
 import { UpdateDishBody, UpdateDishBodyType } from '@/schemaValidations/dish.schema'
+import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -34,8 +33,10 @@ export default function EditDish({
 }) {
   const [file, setFile] = useState<File | null>(null)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
-  const { editingDish } = useAppSelector((state) => state.dishes)
-  const dispatch = useAppDispatch()
+  const { data: editingDish } = useGetDishQuery(id!, { skip: !id })
+  const [uploadImageMutation] = useUploadImageMutation()
+  const [editDishMutation] = useEditDishMutation()
+
   const { toast } = useToast()
   const form = useForm<UpdateDishBodyType>({
     resolver: zodResolver(UpdateDishBody),
@@ -58,7 +59,7 @@ export default function EditDish({
 
   useEffect(() => {
     if (editingDish) {
-      const { name, price, description, image, status } = editingDish
+      const { name, price, description, image, status } = editingDish.data
       form.reset({
         name,
         price,
@@ -80,14 +81,14 @@ export default function EditDish({
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const imageUploadRes = await dispatch(uploadImage(formData)).unwrap()
+        const imageUploadRes = await uploadImageMutation(formData).unwrap()
         const image = imageUploadRes.data
         body = {
           ...values,
           image
         }
       }
-      dispatch(updateDish({ id: id as number, body }))
+      editDishMutation({ id: id as number, body })
         .unwrap()
         .then((res) => {
           toast({ description: res.message })

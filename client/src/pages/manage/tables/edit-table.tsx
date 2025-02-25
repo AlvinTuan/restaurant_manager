@@ -7,26 +7,25 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { TableStatus, TableStatusValues } from '@/constants/type'
+import { useToast } from '@/hooks/use-toast'
 import { getTableLink, getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
-import { useAppDispatch } from '@/redux/hook'
-import { getTableDetail } from '@/redux/slice/tablesSlice'
-import { TableResType, UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
+import { useEditTableMutation, useGetTableQuery } from '@/pages/manage/tables/tables.service'
+import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
-import { useForm, UseFormSetError } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router'
 
 export default function EditTable({
   id,
-  setId,
-  handleUpdateTable
+  setId
 }: {
   id?: number | undefined
   setId: (value: number | undefined) => void
-  handleUpdateTable: (id: number, values: UpdateTableBodyType, formError?: UseFormSetError<any>) => void
 }) {
-  const [table, setTable] = useState<TableResType['data'] | null>(null)
-  const dispatch = useAppDispatch()
+  const { data: editingTable } = useGetTableQuery(id!, { skip: !id })
+  const [editTableMutation] = useEditTableMutation()
+  const { toast } = useToast()
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
     defaultValues: {
@@ -35,34 +34,31 @@ export default function EditTable({
       changeToken: false
     }
   })
-  const tableNumber = 0
 
   useEffect(() => {
-    if (id) {
-      dispatch(getTableDetail(id))
-        .unwrap()
-        .then((res) => {
-          setTable(res.data)
-        })
-        .catch((error) => {
-          handleErrorApi({ error, setError: form.setError })
-        })
-    }
-  }, [dispatch, form.setError, id])
-
-  useEffect(() => {
-    if (table) {
+    if (editingTable && editingTable.data) {
+      const { capacity, status } = editingTable.data
       form.reset({
-        capacity: table.capacity,
-        status: table.status,
+        capacity,
+        status,
         changeToken: form.getValues('changeToken')
       })
     }
-  }, [dispatch, form, table])
+  }, [editingTable, form])
 
   const onEditTable = (values: UpdateTableBodyType) => {
-    handleUpdateTable(id!, values, form.setError)
-    setId(undefined)
+    try {
+      editTableMutation({ id: id as number, body: values })
+        .unwrap()
+        .then((res) =>
+          toast({
+            description: res.message
+          })
+        )
+      setId(undefined)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
   }
 
   return (
@@ -82,7 +78,7 @@ export default function EditTable({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Cập nhật bàn ăn số {table?.number}</DialogTitle>
+          <DialogTitle>Cập nhật bàn ăn số {editingTable?.data.number}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -96,7 +92,13 @@ export default function EditTable({
                 <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
                   <Label htmlFor='name'>Số hiệu bàn</Label>
                   <div className='w-full col-span-3 space-y-2'>
-                    <Input id='number' type='number' className='w-full' value={table?.number ?? 0} readOnly />
+                    <Input
+                      id='number'
+                      type='number'
+                      className='w-full'
+                      value={editingTable?.data.number ?? 0}
+                      readOnly
+                    />
                     <FormMessage />
                   </div>
                 </div>
@@ -166,7 +168,9 @@ export default function EditTable({
                 <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
                   <Label>QR Code</Label>
                   <div className='w-full col-span-3 space-y-2'>
-                    {table && <QRCodeTable token={table.token} tableNumber={table.number}></QRCodeTable>}
+                    {editingTable && editingTable.data && (
+                      <QRCodeTable token={editingTable.data.token} tableNumber={editingTable.data.number}></QRCodeTable>
+                    )}
                   </div>
                 </div>
               </FormItem>
@@ -174,18 +178,18 @@ export default function EditTable({
                 <div className='grid items-center grid-cols-4 gap-4 justify-items-start'>
                   <Label>URL gọi món</Label>
                   <div className='w-full col-span-3 space-y-2'>
-                    {table && (
+                    {editingTable && editingTable.data && (
                       <Link
                         to={getTableLink({
-                          token: table.token,
-                          tableNumber: table.number
+                          token: editingTable.data.token,
+                          tableNumber: editingTable.data.number
                         })}
                         target='_blank'
                         className='break-all'
                       >
                         {getTableLink({
-                          token: table.token,
-                          tableNumber: table.number
+                          token: editingTable.data.token,
+                          tableNumber: editingTable.data.number
                         })}
                       </Link>
                     )}

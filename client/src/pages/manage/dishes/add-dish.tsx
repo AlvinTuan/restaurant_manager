@@ -9,10 +9,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { DishStatus, DishStatusValues } from '@/constants/type'
 import { useToast } from '@/hooks/use-toast'
 import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
-import { useAppDispatch } from '@/redux/hook'
-import { uploadImage } from '@/redux/slice/accountSlice'
-import { addDish } from '@/redux/slice/dishesSlice'
+import { useAddDishMutation } from '@/pages/manage/dishes/dishes.service'
 import { CreateDishBody, CreateDishBodyType } from '@/schemaValidations/dish.schema'
+import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle, Upload } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
@@ -22,7 +21,8 @@ export default function AddDish() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false) // open dialog
   const imageInputRef = useRef<HTMLInputElement | null>(null)
-  const dispatch = useAppDispatch()
+  const [uploadImageMutation] = useUploadImageMutation()
+  const [addDishMutation] = useAddDishMutation()
   const { toast } = useToast()
   const form = useForm<CreateDishBodyType>({
     resolver: zodResolver(CreateDishBody),
@@ -54,16 +54,16 @@ export default function AddDish() {
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const uploadImageRes = await uploadImageMutation(formData).unwrap()
         const image = uploadImageRes.data
         body = {
           ...values,
           image
         }
-        dispatch(addDish(body))
-          .unwrap()
-          .then((res) => toast({ description: res.message }))
       }
+      addDishMutation(body)
+        .unwrap()
+        .then((res) => toast({ description: res.message }))
       reset()
       setOpen(false)
     } catch (error) {

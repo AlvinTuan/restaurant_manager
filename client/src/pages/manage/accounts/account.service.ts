@@ -2,8 +2,10 @@ import { axiosBaseQuery } from '@/redux/api'
 import {
   AccountListResType,
   AccountResType,
+  ChangePasswordBodyType,
   CreateEmployeeAccountBodyType,
-  UpdateEmployeeAccountBodyType
+  UpdateEmployeeAccountBodyType,
+  UpdateMeBodyType
 } from '@/schemaValidations/account.schema'
 import { createApi } from '@reduxjs/toolkit/query/react'
 
@@ -20,6 +22,24 @@ export const accountApi = createApi({
         }
       }
     }),
+    updateMe: build.mutation<AccountResType, UpdateMeBodyType>({
+      query(body) {
+        return {
+          url: 'accounts/me',
+          method: 'put',
+          data: body
+        }
+      }
+    }),
+    changePassword: build.mutation<AccountResType, ChangePasswordBodyType>({
+      query(body) {
+        return {
+          url: 'accounts/me',
+          method: 'post',
+          data: body
+        }
+      }
+    }),
     getEmployees: build.query<AccountListResType, void>({
       query() {
         return {
@@ -27,7 +47,7 @@ export const accountApi = createApi({
           method: 'get'
         }
       },
-      providesTags: (result, error, arg) =>
+      providesTags: (result, _error, _arg) =>
         result ? [...result.data.map(({ id }) => ({ type: 'Employee' as const, id })), 'Employee'] : ['Employee']
     }),
     getEmployee: build.query<AccountResType, number>({
@@ -76,5 +96,7 @@ export const {
   useEditEmployeeMutation,
   useDeleteEmployeeMutation,
   useGetEmployeeQuery,
-  useGetMeQuery
+  useGetMeQuery,
+  useUpdateMeMutation,
+  useChangePasswordMutation
 } = accountApi

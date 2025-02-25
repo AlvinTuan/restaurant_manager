@@ -5,19 +5,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TableStatus, TableStatusValues } from '@/constants/type'
+import { useToast } from '@/hooks/use-toast'
 import { getVietnameseTableStatus } from '@/lib/utils'
+import { useAddTableMutation } from '@/pages/manage/tables/tables.service'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-interface AddTableProps {
-  handleAddTable: (values: CreateTableBodyType) => void
-}
-
-export default function AddTable({ handleAddTable }: AddTableProps) {
+export default function AddTable() {
   const [open, setOpen] = useState(false)
+  const [addTableMutation] = useAddTableMutation()
+  const { toast } = useToast()
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -32,7 +32,11 @@ export default function AddTable({ handleAddTable }: AddTableProps) {
   }
 
   const onAddTable = (values: CreateTableBodyType) => {
-    handleAddTable(values)
+    addTableMutation(values)
+      .unwrap()
+      .then((res) => {
+        toast({ description: res.message })
+      })
     reset()
     setOpen(false)
   }

@@ -1,4 +1,9 @@
+import { formatCurrency } from '@/lib/utils'
+import { useGetDishesQuery } from '@/pages/manage/dishes/dishes.service'
+
 export default function Home() {
+  const { data: getDishesRes } = useGetDishesQuery()
+  const dishes = getDishesRes?.data
   return (
     <div className='w-full space-y-4'>
       <div className='relative'>
@@ -14,20 +19,16 @@ export default function Home() {
       <section className='py-16 space-y-10'>
         <h2 className='text-2xl font-bold text-center'>Đa dạng các món ăn</h2>
         <div className='grid grid-cols-1 gap-10 sm:grid-cols-2'>
-          {Array(4)
-            .fill(0)
-            .map((_, index) => (
+          {dishes &&
+            dishes.map((dish, index) => (
               <div className='flex gap-4 w' key={index}>
                 <div className='flex-shrink-0'>
-                  <img
-                    src='https://ik.imagekit.io/freeflo/production/6b91c700-92c4-4601-8e96-37d84ac3c28c.png?tr=w-2048,q-75&alt=media&pr-true'
-                    className='object-cover w-[150px] h-[150px] rounded-md'
-                  />
+                  <img src={dish.image} className='object-cover w-[150px] h-[150px] rounded-md' />
                 </div>
                 <div className='space-y-1'>
-                  <h3 className='text-xl font-semibold'>Bánh mì</h3>
-                  <p className=''>Bánh mì sandwidch</p>
-                  <p className='font-semibold'>123,123đ</p>
+                  <h3 className='text-xl font-semibold'>{dish.name}</h3>
+                  <p className=''>{dish.description}</p>
+                  <p className='font-semibold'>{formatCurrency(dish.price)}</p>
                 </div>
               </div>
             ))}
