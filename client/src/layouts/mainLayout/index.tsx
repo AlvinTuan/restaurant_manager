@@ -1,49 +1,8 @@
 import { AppSidebar } from '@/components/app-sidebar'
-import { path } from '@/constants/path'
-import { Role } from '@/constants/type'
 import Header from '@/layouts/mainLayout/header'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { getMe } from '@/redux/slice/accountSlice'
-import { useEffect } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router'
-
-const UNAUTHORIZED_ROUTES = ['/login']
+import { Outlet } from 'react-router'
 
 export default function MainLayout() {
-  const auth = useAppSelector((state) => state.auth)
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
-  // const refreshToken = getRefreshTokenFromLS()
-  // const handleLogout = (refreshToken: string) => {
-  //   dispatch(logout({ refreshToken }))
-  //   clearLS()
-  //   navigate('/login', { state: { from: pathname } })
-  // }
-  useEffect(() => {
-    if (UNAUTHORIZED_ROUTES.includes(pathname)) {
-      return
-    }
-    // console.log('auth', auth)
-    if (!auth?.isLoggedIn) {
-      console.log('navigate to /login from ', pathname)
-      navigate('/login', { state: { from: pathname } })
-      return
-    }
-
-    if (pathname === path.login && auth.isLoggedIn) {
-      if (auth.account?.role === Role.Owner || auth.account?.role === Role.Employee) {
-        console.log('Layout: Switch to home')
-        navigate('/', { state: { from: pathname } })
-      }
-    }
-    dispatch(getMe())
-      .unwrap()
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [auth, navigate, pathname, dispatch])
-
   return (
     <>
       <AppSidebar></AppSidebar>

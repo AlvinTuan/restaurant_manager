@@ -39,11 +39,9 @@ import { useToast } from '@/hooks/use-toast'
 import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import AddTable from '@/pages/manage/tables/add-table'
 import EditTable from '@/pages/manage/tables/edit-table'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { addTable, deleteTable, getTables, updateTable } from '@/redux/slice/tablesSlice'
-import { CreateTableBodyType, TableListResType, UpdateTableBodyType } from '@/schemaValidations/table.schema'
+import { useDeleteTableMutation, useGetTablesQuery } from '@/pages/manage/tables/tables.service'
+import { TableListResType } from '@/schemaValidations/table.schema'
 import { createContext, useContext, useEffect, useState } from 'react'
-import { UseFormSetError } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
 
 type TableItem = TableListResType['data'][0]
@@ -60,6 +58,7 @@ const TableTableContext = createContext<{
   setTableDelete: (value: TableItem | null) => {}
 })
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'number',
@@ -123,16 +122,26 @@ export const columns: ColumnDef<TableItem>[] = [
 
 function AlertDialogDeleteTable({
   tableDelete,
-  setTableDelete,
-  handleDeleteTable
+  setTableDelete
 }: {
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
-  handleDeleteTable: (id: number) => void
 }) {
-  const onDelete = () => {
-    handleDeleteTable(tableDelete!.number)
-    setTableDelete(null)
+  const [deleteTableMutation] = useDeleteTableMutation()
+  const { toast } = useToast()
+  const onDeleteTable = () => {
+    try {
+      deleteTableMutation(tableDelete!.number)
+        .unwrap()
+        .then((res) =>
+          toast({
+            description: res.message
+          })
+        )
+      setTableDelete(null)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   return (
@@ -154,7 +163,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onDeleteTable}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -169,9 +178,8 @@ export default function TableTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null)
-  const dispatch = useAppDispatch()
-  const { tables } = useAppSelector((state) => state.tables)
-  const data: any[] = tables
+  const { data: tablesListQuery } = useGetTablesQuery()
+  const data: any[] = tablesListQuery ? tablesListQuery.data : []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -211,67 +219,11 @@ export default function TableTable() {
     })
   }, [table, pageIndex])
 
-  useEffect(() => {
-    dispatch(getTables())
-      .unwrap()
-      .catch((err) => handleErrorApi(err))
-  }, [dispatch])
-
-  /**
-   * Add new table
-   * @param values
-   */
-  const handleAddTable = (values: CreateTableBodyType) => {
-    dispatch(addTable(values))
-      .unwrap()
-      .then((res) => {
-        toast({
-          description: res.message
-        })
-      })
-      .catch((error) => {
-        handleErrorApi({ error })
-      })
-  }
-
-  /**
-   * Update table
-   * @param values
-   */
-  const handleUpdateTable = (id: number, values: UpdateTableBodyType, formError?: UseFormSetError<any>) => {
-    dispatch(updateTable({ id, body: values }))
-      .unwrap()
-      .then((res) => {
-        toast({ description: res.message })
-      })
-      .catch((error) => {
-        handleErrorApi({ error, setError: formError })
-      })
-  }
-
-  /**
-   * Delete table
-   */
-  const handleDeleteTable = (id: number) => {
-    dispatch(deleteTable(id))
-      .unwrap()
-      .then((res) => {
-        toast({ description: res.message })
-      })
-      .catch((error) => {
-        handleErrorApi({ error })
-      })
-  }
-
   return (
     <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>
       <div className='w-full'>
-        <EditTable id={tableIdEdit} setId={setTableIdEdit} handleUpdateTable={handleUpdateTable} />
-        <AlertDialogDeleteTable
-          tableDelete={tableDelete}
-          setTableDelete={setTableDelete}
-          handleDeleteTable={handleDeleteTable}
-        />
+        <EditTable id={tableIdEdit} setId={setTableIdEdit} />
+        <AlertDialogDeleteTable tableDelete={tableDelete} setTableDelete={setTableDelete} />
         <div className='flex items-center py-4'>
           <Input
             placeholder='Lọc số bàn'
@@ -280,7 +232,7 @@ export default function TableTable() {
             className='max-w-sm'
           />
           <div className='flex items-center gap-2 ml-auto'>
-            <AddTable handleAddTable={handleAddTable} />
+            <AddTable />
           </div>
         </div>
         <div className='border rounded-md'>

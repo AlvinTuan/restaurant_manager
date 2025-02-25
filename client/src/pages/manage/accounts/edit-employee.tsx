@@ -13,10 +13,11 @@ import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { getEmployee, updateEmployee, uploadImage } from '@/redux/slice/accountSlice'
+import { useEditEmployeeMutation, useGetEmployeeQuery } from '@/pages/manage/accounts/account.service'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
+import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -31,8 +32,10 @@ export default function EditEmployee({
 }) {
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
-  const dispatch = useAppDispatch()
-  const { editingEmployee } = useAppSelector((state) => state.account)
+  const [uploadImage] = useUploadImageMutation()
+  const [editEmployee] = useEditEmployeeMutation()
+  const { toast } = useToast()
+  const { data: getEmployeeRes } = useGetEmployeeQuery(id!, { skip: !id })
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -54,42 +57,33 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
-  // startEditingEmployee
-  useEffect(() => {
-    if (id) {
-      dispatch(getEmployee(id))
-        .unwrap()
-        .catch((error) => {
-          handleErrorApi({ error })
-        })
-    }
-  }, [dispatch, id])
-
-  // finishEditEmployee
   const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
     try {
       let body = values
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const uploadImageRes = await uploadImage(formData).unwrap()
         const imageUrl = uploadImageRes.data
         body = {
           ...values,
           avatar: imageUrl
         }
       }
-      dispatch(updateEmployee({ id: id as number, body }))
+      editEmployee({ id: id as number, body })
+        .unwrap()
+        .then((res) => {
+          toast({ description: res.message })
+        })
       reset()
-      setId(undefined)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }
   }
 
   useEffect(() => {
-    if (editingEmployee) {
-      const { name, avatar, email } = editingEmployee
+    if (getEmployeeRes) {
+      const { name, avatar, email } = getEmployeeRes.data
       form.reset({
         name,
         avatar: avatar ?? undefined,
@@ -99,7 +93,7 @@ export default function EditEmployee({
         confirmPassword: form.getValues('confirmPassword')
       })
     }
-  }, [editingEmployee, form])
+  }, [form, getEmployeeRes])
 
   const reset = () => {
     setId(undefined)

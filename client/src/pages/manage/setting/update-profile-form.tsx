@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { updateMe, uploadImage } from '@/redux/slice/accountSlice'
+import { useGetMeQuery, useUpdateMeMutation } from '@/pages/manage/accounts/account.service'
+import { useAppDispatch } from '@/redux/hook'
 import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
+import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -18,8 +19,11 @@ export default function UpdateProfileForm() {
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const dispatch = useAppDispatch()
-  const { account } = useAppSelector((state) => state.account)
   const { toast } = useToast()
+  const { data: meRes } = useGetMeQuery()
+  const [uploadImageMutation] = useUploadImageMutation()
+  const [updateMeMutation] = useUpdateMeMutation()
+  const account = meRes?.data
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
@@ -56,17 +60,20 @@ export default function UpdateProfileForm() {
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const uploadImageRes = await dispatch(uploadImage(formData)).unwrap()
+        const uploadImageRes = await uploadImageMutation(formData).unwrap()
         const imageUrl = uploadImageRes.data
         body = {
           ...values,
           avatar: imageUrl
         }
       }
-      const updateMeRes = await dispatch(updateMe(body)).unwrap()
-      toast({
-        description: updateMeRes.message
-      })
+      updateMeMutation(body)
+        .unwrap()
+        .then((res) => {
+          toast({
+            description: res.message
+          })
+        })
     } catch (error) {
       handleErrorApi({
         error,

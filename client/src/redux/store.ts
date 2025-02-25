@@ -1,8 +1,14 @@
-import { accountSlice } from '@/redux/slice/accountSlice'
-import { authSlice } from '@/redux/slice/authSlice'
+import { authApi } from '@/pages/login/auth.service'
+import authReducer from '@/pages/login/auth.slice'
+import { accountApi } from '@/pages/manage/accounts/account.service'
+import { dishesApi } from '@/pages/manage/dishes/dishes.service'
+import { tablesApi } from '@/pages/manage/tables/tables.service'
+import { rtkQueryErrorLogger } from '@/redux/middleware'
 import { dishesSlice } from '@/redux/slice/dishesSlice'
 import { tablesSlice } from '@/redux/slice/tablesSlice'
+import { mediaApi } from '@/services/media.service'
 import { configureStore } from '@reduxjs/toolkit'
+import { setupListeners } from '@reduxjs/toolkit/query'
 
 // const persistConfig = {
 //   key: 'root',
@@ -29,12 +35,28 @@ import { configureStore } from '@reduxjs/toolkit'
 
 export const store = configureStore({
   reducer: {
-    auth: authSlice.reducer,
-    account: accountSlice.reducer,
+    auth: authReducer,
     dishes: dishesSlice.reducer,
-    tables: tablesSlice.reducer
+    tables: tablesSlice.reducer,
+    [authApi.reducerPath]: authApi.reducer,
+    [accountApi.reducerPath]: accountApi.reducer,
+    [mediaApi.reducerPath]: mediaApi.reducer,
+    [dishesApi.reducerPath]: dishesApi.reducer,
+    [tablesApi.reducerPath]: tablesApi.reducer
+  },
+  middleware(getDefaultMiddleware) {
+    return getDefaultMiddleware().concat(
+      authApi.middleware,
+      accountApi.middleware,
+      mediaApi.middleware,
+      dishesApi.middleware,
+      tablesApi.middleware,
+      rtkQueryErrorLogger
+    )
   }
 })
+
+setupListeners(store.dispatch)
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>

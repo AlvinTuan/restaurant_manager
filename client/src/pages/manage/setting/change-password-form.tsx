@@ -3,16 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-import accountApi from '@/apiRequests/account.api'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import { useChangePasswordMutation } from '@/pages/manage/accounts/account.service'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 export default function ChangePasswordForm() {
   const { toast } = useToast()
+  const [changePasswordMutation] = useChangePasswordMutation()
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -27,8 +28,13 @@ export default function ChangePasswordForm() {
 
   const onSubmit = async (values: ChangePasswordBodyType) => {
     try {
-      const changePasswordRes = await accountApi.changePasswordRequest(values)
-      toast({ description: changePasswordRes.data.message })
+      changePasswordMutation(values)
+        .unwrap()
+        .then((res) =>
+          toast({
+            description: res.message
+          })
+        )
       reset()
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })

@@ -1,6 +1,6 @@
 import { DishStatus, TableStatus } from '@/constants/type'
 import { toast } from '@/hooks/use-toast'
-import { EntityError } from '@/lib/http'
+import { isEntityError } from '@/lib/helpers'
 import { clsx, type ClassValue } from 'clsx'
 import type { UseFormSetError } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
@@ -18,7 +18,8 @@ export const handleErrorApi = ({
   setError?: UseFormSetError<any>
   duration?: number
 }) => {
-  if (error instanceof EntityError && setError) {
+  // console.log(isEntityError(error), error)
+  if (isEntityError(error) && setError) {
     error.payload.errors.forEach((element) => {
       console.log(element.field)
       setError(element.field, {
@@ -31,7 +32,7 @@ export const handleErrorApi = ({
       variant: 'destructive',
       title: 'Lỗi',
       description: error?.payload?.message ?? 'Lỗi không xác định',
-      duration: duration ?? 3000
+      duration: duration ?? 2000
     })
   }
 }

@@ -17,14 +17,6 @@ export const URL_LOGIN = 'auth/login'
 export const URL_LOGOUT = 'auth/logout'
 export const URL_REFRESH_TOKEN = '/auth/refresh-token'
 
-type EntityErrorPayload = {
-  message: string
-  errors: {
-    field: string
-    message: string
-  }[]
-}
-
 export class HttpError extends Error {
   status: number
   payload: {
@@ -38,6 +30,13 @@ export class HttpError extends Error {
   }
 }
 
+type EntityErrorPayload = {
+  message: string
+  errors: {
+    field: string
+    message: string
+  }[]
+}
 export class EntityError extends HttpError {
   status: typeof HttpStatus.ENTITY_ERROR_STATUS
   payload: EntityErrorPayload
@@ -80,12 +79,15 @@ class Http {
     // Add a request interceptor
     this.instance.interceptors.request.use(
       (config) => {
+        console.log(config)
         if (this.accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${this.accessToken}`
+          config.headers['Content-Type'] = config.data instanceof FormData ? undefined : 'application/json'
         }
         return config
       },
       function (error) {
+        console.log(error)
         return Promise.reject(error)
       }
     )

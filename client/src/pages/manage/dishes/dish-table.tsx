@@ -39,9 +39,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast'
 import { formatCurrency, getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import AddDish from '@/pages/manage/dishes/add-dish'
+import { useDeleteDishMutation, useGetDishesQuery } from '@/pages/manage/dishes/dishes.service'
 import EditDish from '@/pages/manage/dishes/edit-dish'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { deleteDish, getDishes, startEditDish } from '@/redux/slice/dishesSlice'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
@@ -104,10 +103,8 @@ export const columns: ColumnDef<DishItem>[] = [
     enableHiding: false,
     cell: function Actions({ row }) {
       const { setDishIdEdit, setDishDelete } = useContext(DishTableContext)
-      const dispatch = useAppDispatch()
       const openEditDish = () => {
         setDishIdEdit(row.original.id)
-        dispatch(startEditDish(row.original.id))
       }
 
       const openDeleteDish = () => {
@@ -140,12 +137,12 @@ function AlertDialogDeleteDish({
   dishDelete: DishItem | null
   setDishDelete: (value: DishItem | null) => void
 }) {
-  const dispatch = useAppDispatch()
   const { toast } = useToast()
+  const [deleteDishMutation] = useDeleteDishMutation()
   const handleDelete = async () => {
     if (dishDelete) {
       try {
-        await dispatch(deleteDish(dishDelete.id))
+        await deleteDishMutation(dishDelete.id)
           .unwrap()
           .then((res) => {
             toast({ description: res.message })
@@ -188,8 +185,8 @@ export default function DishTable() {
   const pageIndex = page - 1
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
-  const { dishes } = useAppSelector((state) => state.dishes)
-  const data: any[] = dishes
+  const { data: dishesListQuery } = useGetDishesQuery()
+  const data: any[] = dishesListQuery ? dishesListQuery.data : []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -227,12 +224,6 @@ export default function DishTable() {
       pageSize: PAGE_SIZE
     })
   }, [table, pageIndex])
-  const dispatch = useAppDispatch()
-  useEffect(() => {
-    dispatch(getDishes())
-      .unwrap()
-      .catch((error) => console.log(error))
-  }, [dispatch])
 
   return (
     <DishTableContext.Provider value={{ dishIdEdit, setDishIdEdit, dishDelete, setDishDelete }}>

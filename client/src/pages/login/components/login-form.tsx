@@ -3,18 +3,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import { useLoginMutation } from '@/pages/login/auth.service'
 import { PasswordInput } from '@/pages/login/components/password-input'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { login } from '@/redux/slice/authSlice'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
 
 export default function LoginForm() {
   const { toast } = useToast()
-  const dispatch = useAppDispatch()
-  const auth = useAppSelector((state) => state.auth)
+  const [login, loginResult] = useLoginMutation()
+  const navigate = useNavigate()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -23,19 +23,17 @@ export default function LoginForm() {
     }
   })
 
-  function onSubmit(values: LoginBodyType) {
-    dispatch(login(values))
-      .unwrap()
-      .then((res) => {
-        console.log(res)
-        toast({
-          description: res.message,
-          duration: 3000
-        })
+  const onSubmit = async (values: LoginBodyType) => {
+    try {
+      const res = await login(values).unwrap()
+      toast({
+        description: res.message
       })
-      .catch((err) => {
-        handleErrorApi({ error: err, setError: form.setError })
-      })
+      navigate('/manage/dashboard')
+    } catch (error) {
+      console.log(error)
+      handleErrorApi({ error, setError: form.setError })
+    }
   }
   return (
     <Form {...form}>
@@ -66,8 +64,8 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button className='w-full' type='submit' disabled={auth.status === 'loading'}>
-          {auth.status === 'loading' && <Loader2 className='animate-spin' />}
+        <Button className='w-full' type='submit' disabled={loginResult.isLoading}>
+          {loginResult.isLoading && <Loader2 className='animate-spin' />}
           Đăng nhập
         </Button>
       </form>

@@ -8,22 +8,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { path } from '@/constants/path'
 import { getRefreshTokenFromLS } from '@/lib/auth'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { logout } from '@/redux/slice/authSlice'
-import { Link } from 'react-router'
+import { handleErrorApi } from '@/lib/utils'
+import { useLogoutMutation } from '@/pages/login/auth.service'
+import { useGetMeQuery } from '@/pages/manage/accounts/account.service'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 export default function DropdownAvatar() {
-  const dispatch = useAppDispatch()
   const refreshToken = getRefreshTokenFromLS()
-  const { account } = useAppSelector((state) => state.account)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { data: getAccountRes, isFetching } = useGetMeQuery()
 
-  const handleLogout = (refreshToken: string) => {
-    dispatch(
-      logout({
-        refreshToken
-      })
-    )
+  const [logout] = useLogoutMutation()
+
+  const onLogout = async (refreshToken: string) => {
+    try {
+      await logout({ refreshToken }).unwrap()
+      navigate(path.login, { state: { from: location.pathname } })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   return (
@@ -31,13 +37,13 @@ export default function DropdownAvatar() {
       <DropdownMenuTrigger asChild>
         <Button variant='outline' size='icon' className='overflow-hidden rounded-full'>
           <Avatar>
-            <AvatarImage src={account?.avatar ?? undefined} alt={account?.name} />
-            <AvatarFallback>{account?.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            <AvatarImage src={getAccountRes?.data?.avatar ?? undefined} alt={getAccountRes?.data?.name} />
+            <AvatarFallback>{getAccountRes?.data?.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuLabel>{account?.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{getAccountRes?.data?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to={'/manage/setting'} className='cursor-pointer'>
@@ -46,7 +52,7 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleLogout(refreshToken)}>Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onLogout(refreshToken)}>Đăng xuất</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
