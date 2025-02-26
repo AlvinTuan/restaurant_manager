@@ -5,7 +5,7 @@ import {
   setAccessTokenToLS,
   setRefreshTokenToLS
 } from '@/lib/auth'
-import { LoginResType, RefreshTokenResType } from '@/schemaValidations/auth.schema'
+import { LoginResType } from '@/schemaValidations/auth.schema'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 enum HttpStatus {
@@ -67,11 +67,9 @@ class Http {
   instance: AxiosInstance
   private accessToken: string
   private refreshToken: string
-  private refreshTokenRequest: Promise<string> | null
   constructor() {
     this.accessToken = getAccessTokenFromLS()
     this.refreshToken = getRefreshTokenFromLS()
-    this.refreshTokenRequest = null
     this.instance = axios.create({
       baseURL: 'http://localhost:4000/',
       timeout: 10000
@@ -79,7 +77,8 @@ class Http {
     // Add a request interceptor
     this.instance.interceptors.request.use(
       (config) => {
-        console.log(config)
+        console.log(this.accessToken)
+        this.accessToken = getAccessTokenFromLS()
         if (this.accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${this.accessToken}`
           config.headers['Content-Type'] = config.data instanceof FormData ? undefined : 'application/json'
@@ -96,16 +95,19 @@ class Http {
     this.instance.interceptors.response.use(
       (response) => {
         const { url } = response.config
-        if (url === URL_LOGIN) {
-          this.accessToken = (response.data as LoginResType).data.accessToken
-          this.refreshToken = (response.data as LoginResType).data.refreshToken
-          setAccessTokenToLS(this.accessToken)
-          setRefreshTokenToLS(this.refreshToken)
-        } else if (url === URL_LOGOUT) {
-          this.accessToken = ''
-          this.refreshToken = ''
-          clearLS()
+        if (url) {
+          if (['guest/auth/login', URL_LOGIN].includes(url)) {
+            this.accessToken = (response.data as LoginResType).data.accessToken
+            this.refreshToken = (response.data as LoginResType).data.refreshToken
+            setAccessTokenToLS(this.accessToken)
+            setRefreshTokenToLS(this.refreshToken)
+          } else if (['guest/auth/login', URL_LOGOUT].includes(url)) {
+            this.accessToken = ''
+            this.refreshToken = ''
+            clearLS()
+          }
         }
+
         return response
       },
       (error: AxiosError) => {
@@ -136,36 +138,6 @@ class Http {
           // nếu là lỗi 401
         } else if (error.status === HttpStatus.UNAUTHORIZED_ERROR_STATUS) {
           // console.log('401 error -->', error)
-          const config = error.response!.config
-          const { url } = config
-          // trường hợp Token hết hạn và request đó không phải là của request refresh token
-          // thì mới tiến hành gọi refresh-token
-
-          console.log('config -->', config)
-          if (url !== URL_REFRESH_TOKEN) {
-            // hạn chế gọi 2 lần handleRefreshToken
-            this.refreshTokenRequest = this.refreshTokenRequest
-              ? this.refreshTokenRequest
-              : this.handleRefreshToken().finally(() => {
-                  // xủ lý resolve 1 access token hết hạn
-                  setTimeout(() => {
-                    this.refreshTokenRequest = null
-                  }, 10000)
-                })
-            return this.refreshTokenRequest
-              .then((accessToken) => {
-                return this.instance({
-                  ...config,
-                  headers: {
-                    ...config.headers,
-                    Authorization: accessToken
-                  }
-                }) // gọi lại API bị lỗi
-              })
-              .catch((refreshTokenError) => {
-                throw refreshTokenError
-              })
-          }
           // còn những trường hợp như token không đúng, không truyền token, token hết hạn
           // nhưng gọi refresh token bị fail (refresh-token hết hạn) thì tiến hành xoá local storage và toast message
 
@@ -179,23 +151,6 @@ class Http {
         return Promise.reject(error)
       }
     )
-  }
-  private handleRefreshToken = () => {
-    return this.instance
-      .post<RefreshTokenResType>(URL_REFRESH_TOKEN, { refreshToken: this.refreshToken })
-      .then((res) => {
-        const { accessToken } = res.data.data
-        setAccessTokenToLS(accessToken)
-        this.accessToken = accessToken
-        return accessToken
-      })
-      .catch((err) => {
-        clearLS()
-        this.accessToken = ''
-        this.refreshToken = ''
-        console.log(err)
-        throw err
-      })
   }
 }
 

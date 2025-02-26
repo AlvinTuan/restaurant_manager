@@ -1,21 +1,17 @@
-import http, { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN } from '@/lib/http'
-import {
-  LoginBodyType,
-  LoginResType,
-  LogoutBodyType,
-  RefreshTokenBodyType,
-  RefreshTokenResType
-} from '@/schemaValidations/auth.schema'
+import http, { URL_REFRESH_TOKEN } from '@/lib/http'
+import { RefreshTokenBodyType, RefreshTokenResType } from '@/schemaValidations/auth.schema'
+import { AxiosResponse } from 'axios'
 
 const authApi = {
-  loginRequest(body: LoginBodyType) {
-    return http.post<LoginResType>(URL_LOGIN, body)
-  },
-  logoutRequest(body: LogoutBodyType) {
-    return http.post(URL_LOGOUT, body)
-  },
-  refreshTokenRequest(body: RefreshTokenBodyType) {
-    return http.post<RefreshTokenResType>(URL_REFRESH_TOKEN, body)
+  refreshTokenPromise: null as Promise<AxiosResponse<RefreshTokenResType>> | null,
+  async refreshTokenRequest(body: RefreshTokenBodyType): Promise<AxiosResponse<RefreshTokenResType>> {
+    if (this.refreshTokenPromise) {
+      return this.refreshTokenPromise
+    }
+    this.refreshTokenPromise = http.post<RefreshTokenResType>(URL_REFRESH_TOKEN, body)
+    const res = await this.refreshTokenPromise
+    this.refreshTokenPromise = null // Reset promise sau khi gọi xong.
+    return res
   }
 }
 
