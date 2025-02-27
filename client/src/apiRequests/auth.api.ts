@@ -2,7 +2,7 @@ import http, { URL_REFRESH_TOKEN } from '@/lib/http'
 import { RefreshTokenBodyType, RefreshTokenResType } from '@/schemaValidations/auth.schema'
 import { AxiosResponse } from 'axios'
 
-const authApi = {
+const authApiRequest = {
   refreshTokenPromise: null as Promise<AxiosResponse<RefreshTokenResType>> | null,
   async refreshTokenRequest(body: RefreshTokenBodyType): Promise<AxiosResponse<RefreshTokenResType>> {
     if (this.refreshTokenPromise) {
@@ -15,4 +15,4 @@ const authApi = {
   }
 }
 
-export default authApi
+export default authApiRequest

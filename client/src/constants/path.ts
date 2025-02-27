@@ -6,5 +6,6 @@ export enum path {
   manageSetting = '/manage/setting',
   manageAccounts = '/manage/accounts',
   manageDishes = '/manage/dishes',
-  manageTables = '/manage/tables'
+  manageTables = '/manage/tables',
+  manageOrders = '/manage/orders'
 }

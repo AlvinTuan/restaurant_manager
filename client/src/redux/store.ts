@@ -1,3 +1,4 @@
+import { guestApi } from '@/pages/guest/guest.service'
 import { authApi } from '@/pages/login/auth.service'
 import authReducer from '@/pages/login/auth.slice'
 import { accountApi } from '@/pages/manage/accounts/account.service'
@@ -38,7 +39,8 @@ export const store = configureStore({
     [accountApi.reducerPath]: accountApi.reducer,
     [mediaApi.reducerPath]: mediaApi.reducer,
     [dishesApi.reducerPath]: dishesApi.reducer,
-    [tablesApi.reducerPath]: tablesApi.reducer
+    [tablesApi.reducerPath]: tablesApi.reducer,
+    [guestApi.reducerPath]: guestApi.reducer
   },
   middleware(getDefaultMiddleware) {
     return getDefaultMiddleware().concat(
@@ -47,6 +49,7 @@ export const store = configureStore({
       mediaApi.middleware,
       dishesApi.middleware,
       tablesApi.middleware,
+      guestApi.middleware,
       rtkQueryErrorLogger
     )
   }

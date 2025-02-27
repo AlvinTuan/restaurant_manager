@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import authApi from '@/apiRequests/auth.api'
-import { DishStatus, TableStatus } from '@/constants/type'
+import authApiRequest from '@/apiRequests/auth.api'
+import guestApiRequest from '@/apiRequests/guest.api'
+import { TokenPayload } from '@/constants/jwt.types'
+import { DishStatus, OrderStatus, Role, TableStatus } from '@/constants/type'
 import { toast } from '@/hooks/use-toast'
 import {
   clearLS,
@@ -58,6 +60,21 @@ export const getVietnameseDishStatus = (status: 'Available' | 'Unavailable' | 'H
   }
 }
 
+export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+  switch (status) {
+    case OrderStatus.Delivered:
+      return 'Đã phục vụ'
+    case OrderStatus.Paid:
+      return 'Đã thanh toán'
+    case OrderStatus.Pending:
+      return 'Chờ xử lý'
+    case OrderStatus.Processing:
+      return 'Đang nấu'
+    default:
+      return 'Từ chối'
+  }
+}
+
 export const formatCurrency = (number: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -80,7 +97,7 @@ export const getTableLink = ({ token, tableNumber }: { token: string; tableNumbe
   return 'http://localhost:3000' + '/table-order/' + tableNumber + '?token=' + token
 }
 
-export const decodeToken = (token: string | null) => (token ? jwtDecode(token) : null)
+export const decodeToken = (token: string | null) => (token ? (jwtDecode(token) as TokenPayload) : null)
 
 export const isTokenExpired = (decodedToken: any | null) => {
   if (!decodedToken || !decodedToken.exp) {
@@ -104,7 +121,11 @@ export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuc
   if (decodedAccessToken && decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3) {
     // Gọi API refresh token
     try {
-      const res = await authApi.refreshTokenRequest({ refreshToken })
+      const role = decodedRefreshToken?.role
+      const res =
+        role === Role.Guest
+          ? await guestApiRequest.refreshTokenRequest({ refreshToken })
+          : await authApiRequest.refreshTokenRequest({ refreshToken })
       setAccessTokenToLS(res.data.data.accessToken)
       setRefreshTokenToLS(res.data.data.refreshToken)
       param?.onSuccess && param.onSuccess()

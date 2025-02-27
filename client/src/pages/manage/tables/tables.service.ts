@@ -48,7 +48,7 @@ export const tablesApi = createApi({
           data: body
         }
       },
-      invalidatesTags: (_result, _error, arg, _meta) => [{ type: 'Tables', id: arg.id }]
+      invalidatesTags: (_result, _error, arg, _meta) => [{ type: 'Tables', number: arg.id }]
     }),
     deleteTable: build.mutation<TableResType, number>({
       query(id) {
@@ -57,7 +57,7 @@ export const tablesApi = createApi({
           method: 'delete'
         }
       },
-      invalidatesTags: (_result, _error, arg, _meta) => [{ type: 'Tables', id: arg }]
+      invalidatesTags: (_result, _error, arg, _meta) => [{ type: 'Tables', number: arg }]
     })
   })
 })
