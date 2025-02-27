@@ -1,27 +1,30 @@
-import { AccountResType } from '@/schemaValidations/account.schema'
-import { createSlice } from '@reduxjs/toolkit'
+import { RoleType } from '@/constants/jwt.types'
+import { getAccessTokenFromLS } from '@/lib/auth'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface AuthState {
-  isLoggedIn: boolean
-  account: AccountResType['data'] | null
+  role: RoleType | undefined
+  isAuth: boolean
 }
 
 const initialState: AuthState = {
-  isLoggedIn: false,
-  account: null
+  role: undefined,
+  isAuth: Boolean(getAccessTokenFromLS())
 }
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    signOut: (state, _action) => {
-      state.isLoggedIn = false
-      state.account = null
+    setRole: (state, action: PayloadAction<RoleType | undefined>) => {
+      state.role = action.payload
+      if (action.payload === undefined) {
+        state.isAuth = false
+      }
     }
   }
 })
 
 const authReducer = authSlice.reducer
-export const { signOut } = authSlice.actions
+export const { setRole } = authSlice.actions
 export default authReducer
