@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { useGetMeQuery, useUpdateMeMutation } from '@/pages/manage/accounts/account.service'
-import { useAppDispatch } from '@/redux/hook'
 import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
 import { useUploadImageMutation } from '@/services/media.service'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,7 +17,6 @@ import { useForm } from 'react-hook-form'
 export default function UpdateProfileForm() {
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
-  const dispatch = useAppDispatch()
   const { toast } = useToast()
   const { data: meRes } = useGetMeQuery()
   const [uploadImageMutation] = useUploadImageMutation()
