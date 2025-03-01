@@ -52,10 +52,10 @@ const TableTableContext = createContext<{
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }>({
-  setTableIdEdit: (value: number | undefined) => {},
+  setTableIdEdit: (_value: number | undefined) => {},
   tableIdEdit: undefined,
   tableDelete: null,
-  setTableDelete: (value: TableItem | null) => {}
+  setTableDelete: (_value: TableItem | null) => {}
 })
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -188,7 +188,6 @@ export default function TableTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
-  const { toast } = useToast()
 
   const table = useReactTable({
     data,

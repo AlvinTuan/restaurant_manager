@@ -51,7 +51,7 @@ const menuItems: {
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const { role, isAuth } = useAppSelector((state) => state.auth)
+  const { role } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const [logoutMutaion] = useLogoutMutation()
   const refreshToken = getRefreshTokenFromLS()

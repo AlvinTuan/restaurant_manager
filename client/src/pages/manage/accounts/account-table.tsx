@@ -183,7 +183,7 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const { data: employeeList, isFetching } = useGetEmployeesQuery()
+  const { data: employeeList } = useGetEmployeesQuery()
   const data: any[] = employeeList ? employeeList.data : []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

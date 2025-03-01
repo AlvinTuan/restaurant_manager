@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast'
 import { socket } from '@/lib/socket'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
 import { useGetOrderOfGuestQuery } from '@/pages/guest/guest.service'
-import { UpdateOrderResType } from '@/schemaValidations/order.schema'
+import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import { useEffect } from 'react'
 
 export default function DishCard() {
@@ -15,6 +15,8 @@ export default function DishCard() {
   }, 0)
 
   useEffect(() => {
+    socket.connect()
+
     if (socket.connected) {
       onConnect()
     }
@@ -40,8 +42,16 @@ export default function DishCard() {
       refetch()
     }
 
-    socket.on('update-order', onUpdateOrder)
+    function onPayment(data: PayGuestOrdersResType['data']) {
+      const { guest } = data[0]
+      toast({
+        description: `${guest?.name} tại bàn ${guest?.tableNumber} thanh toán thành công ${data.length} đơn`
+      })
+      refetch()
+    }
 
+    socket.on('update-order', onUpdateOrder)
+    socket.on('payment', onPayment)
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
 
@@ -49,8 +59,9 @@ export default function DishCard() {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
       socket.off('update-order', onUpdateOrder)
+      socket.off('payment', onPayment)
     }
-  }, [refetch])
+  }, [refetch, toast])
 
   return (
     <>

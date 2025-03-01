@@ -2,8 +2,8 @@ import { Role } from '@/constants/type'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { checkAndRefreshToken, decodeToken, isTokenExpired } from '@/lib/utils'
 import { setRole } from '@/pages/login/auth.slice'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
-import { useEffect, useState } from 'react'
+import { useAppDispatch } from '@/redux/hook'
+import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 
 const managePaths = ['/manage']
@@ -14,10 +14,9 @@ const unAuthPaths = ['/login']
 export default function AuthRoute() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { isAuth } = useAppSelector((state) => state.auth)
   const refreshToken = getRefreshTokenFromLS()
   const dispatch = useAppDispatch()
-  const [isDialogVisible, setDialogVisible] = useState(false)
+  // const [isDialogVisible, setDialogVisible] = useState(false)
 
   useEffect(() => {
     const decodeRefreshToken = decodeToken(refreshToken)
@@ -49,7 +48,7 @@ export default function AuthRoute() {
     if (isGuestGoToManagePath || isNotGuestGoToGuestPath) {
       navigate('/', { state: { from: pathname } })
     }
-  }, [dispatch, isAuth, navigate, pathname, refreshToken])
+  }, [dispatch, navigate, pathname, refreshToken])
 
   useEffect(() => {
     if (unAuthPaths.includes(pathname)) return

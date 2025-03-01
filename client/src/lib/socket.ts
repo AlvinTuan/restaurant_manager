@@ -7,5 +7,6 @@ const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhos
 export const socket = io(URL, {
   auth: {
     Authorization: `Bearer ${getAccessTokenFromLS()}`
-  }
+  },
+  autoConnect: false
 })
