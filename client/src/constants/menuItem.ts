@@ -1,36 +1,31 @@
-import { Role } from '@/constants/type'
+import { path } from '@/constants/path'
 import { Home, Salad, ShoppingCart, Table, Users2 } from 'lucide-react'
 
 const menuItems = [
   {
     title: 'Dashboard',
     Icon: Home,
-    href: '/manage/dashboard',
-    roles: [Role.Owner, Role.Employee]
+    href: path.manageDashboard
   },
   {
     title: 'Đơn hàng',
     Icon: ShoppingCart,
-    href: '/manage/orders',
-    roles: [Role.Owner, Role.Employee]
+    href: path.manageOrders
   },
   {
     title: 'Bàn ăn',
     Icon: Table,
-    href: '/manage/tables',
-    roles: [Role.Owner, Role.Employee]
+    href: path.manageTables
   },
   {
     title: 'Món ăn',
     Icon: Salad,
-    href: '/manage/dishes',
-    roles: [Role.Owner, Role.Employee]
+    href: path.manageDishes
   },
   {
     title: 'Nhân viên',
     Icon: Users2,
-    href: '/manage/accounts',
-    roles: [Role.Owner]
+    href: path.manageAccounts
   }
 ]
 
