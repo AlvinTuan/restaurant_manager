@@ -1,5 +1,5 @@
 import { AppSidebar } from '@/components/app-sidebar'
-import Header from '@/layouts/mainLayout/header'
+import Header from '@/layouts/main-layout/header'
 import { Outlet } from 'react-router'
 
 export default function MainLayout() {

@@ -2,6 +2,7 @@ import { guestApi } from '@/pages/guest/guest.service'
 import { authApi } from '@/pages/login/auth.service'
 import authReducer from '@/pages/login/auth.slice'
 import { accountApi } from '@/pages/manage/accounts/account.service'
+import { dashboardApi } from '@/pages/manage/dashboard/dashboard.service'
 import { dishesApi } from '@/pages/manage/dishes/dishes.service'
 import { ordersApi } from '@/pages/manage/orders/orders.service'
 import { tablesApi } from '@/pages/manage/tables/tables.service'
@@ -42,7 +43,8 @@ export const store = configureStore({
     [dishesApi.reducerPath]: dishesApi.reducer,
     [tablesApi.reducerPath]: tablesApi.reducer,
     [guestApi.reducerPath]: guestApi.reducer,
-    [ordersApi.reducerPath]: ordersApi.reducer
+    [ordersApi.reducerPath]: ordersApi.reducer,
+    [dashboardApi.reducerPath]: dashboardApi.reducer
   },
   middleware(getDefaultMiddleware) {
     return getDefaultMiddleware().concat(
@@ -53,6 +55,7 @@ export const store = configureStore({
       tablesApi.middleware,
       guestApi.middleware,
       ordersApi.middleware,
+      dashboardApi.middleware,
       rtkQueryErrorLogger
     )
   }
