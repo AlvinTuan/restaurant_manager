@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/alert-dialog'
 import { RoleType } from '@/constants/jwt.types'
 import { Role } from '@/constants/type'
+import { useAppContext } from '@/context/app-provider'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/pages/login/auth.service'
-import { setRole } from '@/pages/login/auth.slice'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
 import { Link } from 'react-router'
 
@@ -50,16 +50,18 @@ const menuItems: {
   }
 ]
 
-export default function NavItems({ className }: { className?: string }) {
+export default function NavLinks({ className }: { className?: string }) {
   const { role } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const [logoutMutaion] = useLogoutMutation()
   const refreshToken = getRefreshTokenFromLS()
+  const { setRole, disconnectSocket } = useAppContext()
 
   const logout = () => {
     try {
       logoutMutaion({ refreshToken })
-      dispatch(setRole())
+      setRole()
+      disconnectSocket()
     } catch (error) {
       handleErrorApi({ error })
     }

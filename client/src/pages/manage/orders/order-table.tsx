@@ -21,8 +21,8 @@ import { createContext, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useAppContext } from '@/context/app-provider'
 import { toast } from '@/hooks/use-toast'
-import { socket } from '@/lib/socket'
 import { cn } from '@/lib/utils'
 import EditOrder from '@/pages/manage/orders/edit-order'
 import OrderStatics from '@/pages/manage/orders/order-statics'
@@ -34,10 +34,11 @@ import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 import { endOfDay, format, startOfDay } from 'date-fns'
 import { useSearchParams } from 'react-router'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const OrderTableContext = createContext({
-  setOrderIdEdit: (value: number | undefined) => {},
+  setOrderIdEdit: (_value: number | undefined) => {},
   orderIdEdit: undefined as number | undefined,
-  changeStatus: (payload: {
+  changeStatus: (_payload: {
     orderId: number
     dishId: number
     status: (typeof OrderStatusValues)[number]
@@ -59,6 +60,7 @@ const initFromDate = startOfDay(new Date()) // 00:00:00 ngày truy cập
 const initToDate = endOfDay(new Date()) // 23:59:59 ngày kết thúc
 export default function OrderTable() {
   const [searchParam] = useSearchParams()
+
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
   const [fromDate, setFromDate] = useState(initFromDate)
   const [toDate, setToDate] = useState(initToDate)
@@ -101,14 +103,15 @@ export default function OrderTable() {
     }
   }
 
+  const { socket } = useAppContext()
   useEffect(() => {
-    socket.connect()
-    if (socket.connected) {
+    socket?.connect()
+    if (socket?.connected) {
       onConnect()
     }
 
     function onConnect() {
-      console.log(socket.id)
+      console.log(socket?.id)
     }
 
     function onDisconnect() {
@@ -142,7 +145,7 @@ export default function OrderTable() {
       })
       refetchOrderList()
     }
-    socket.on('payment', onPayment)
+    socket?.on('payment', onPayment)
 
     function onNewOrder(data: GuestCreateOrdersResType['data']) {
       const { guest } = data[0]
@@ -152,21 +155,21 @@ export default function OrderTable() {
       refetch()
     }
 
-    socket.on('update-order', onUpdateOrder)
-    socket.on('new-order', onNewOrder)
-    socket.on('payment', onPayment)
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('update-order', onUpdateOrder)
+    socket?.on('new-order', onNewOrder)
+    socket?.on('payment', onPayment)
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
-      socket.off('payment', onPayment)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('payment', onPayment)
 
-      socket.off('update-order', onUpdateOrder)
-      socket.off('new-order', onNewOrder)
+      socket?.off('update-order', onUpdateOrder)
+      socket?.off('new-order', onNewOrder)
     }
-  }, [refetch, fromDate, toDate])
+  }, [refetch, fromDate, toDate, socket])
 
   const table = useReactTable({
     data: orderList,

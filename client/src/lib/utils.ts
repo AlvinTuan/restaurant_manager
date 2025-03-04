@@ -17,6 +17,7 @@ import { format } from 'date-fns'
 import { jwtDecode } from 'jwt-decode'
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
 import type { UseFormSetError } from 'react-hook-form'
+import { io } from 'socket.io-client'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -109,7 +110,11 @@ export const isTokenExpired = (decodedToken: any | null) => {
   return decodedToken.exp - now <= 0
 }
 
-export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuccess?: () => void }) => {
+export const checkAndRefreshToken = async (param?: {
+  onError?: () => void
+  onSuccess?: () => void
+  force?: boolean
+}) => {
   const accessToken = getAccessTokenFromLS()
   const refreshToken = getRefreshTokenFromLS()
   if (!accessToken || !refreshToken) return
@@ -120,7 +125,10 @@ export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuc
     clearLS()
     return param?.onError && param.onError()
   }
-  if (decodedAccessToken && decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3) {
+  if (
+    param?.force || // buoc phai refresh token
+    (decodedAccessToken && decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3)
+  ) {
     // Gọi API refresh token
     try {
       const role = decodedRefreshToken?.role
@@ -165,4 +173,13 @@ export const OrderStatusIcon = {
   [OrderStatus.Rejected]: BookX,
   [OrderStatus.Delivered]: Truck,
   [OrderStatus.Paid]: HandCoins
+}
+
+export const generateSocketInstace = (accessToken: string) => {
+  const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000'
+  return io(URL, {
+    auth: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
 }

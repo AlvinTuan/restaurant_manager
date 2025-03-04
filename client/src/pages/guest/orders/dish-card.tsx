@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
+import { useAppContext } from '@/context/app-provider'
 import { useToast } from '@/hooks/use-toast'
-import { socket } from '@/lib/socket'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
 import { useGetOrderOfGuestQuery } from '@/pages/guest/guest.service'
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
@@ -9,20 +9,19 @@ import { useEffect } from 'react'
 export default function DishCard() {
   const { data: ordersRes, refetch } = useGetOrderOfGuestQuery()
   const orders = ordersRes?.data ?? []
+  const { socket } = useAppContext()
   const { toast } = useToast()
   const totalPrice = orders.reduce((sum, order) => {
     return sum + order.dishSnapshot.price * order.quantity
   }, 0)
 
   useEffect(() => {
-    socket.connect()
-
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect()
     }
 
     function onConnect() {
-      console.log(socket.id)
+      console.log(socket?.id)
     }
 
     function onDisconnect() {
@@ -50,18 +49,18 @@ export default function DishCard() {
       refetch()
     }
 
-    socket.on('update-order', onUpdateOrder)
-    socket.on('payment', onPayment)
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('update-order', onUpdateOrder)
+    socket?.on('payment', onPayment)
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
-      socket.off('update-order', onUpdateOrder)
-      socket.off('payment', onPayment)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('update-order', onUpdateOrder)
+      socket?.off('payment', onPayment)
     }
-  }, [refetch, toast])
+  }, [refetch, socket, toast])
 
   return (
     <>

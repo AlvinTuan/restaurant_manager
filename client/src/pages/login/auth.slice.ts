@@ -1,15 +1,15 @@
 import { RoleType } from '@/constants/jwt.types'
-import { getAccessTokenFromLS } from '@/lib/auth'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { Socket } from 'socket.io-client'
 
 interface AuthState {
   role: RoleType | undefined
-  isAuth: boolean
+  socket: Socket | undefined
 }
 
 const initialState: AuthState = {
   role: undefined,
-  isAuth: Boolean(getAccessTokenFromLS())
+  socket: undefined
 }
 
 const authSlice = createSlice({
@@ -18,9 +18,6 @@ const authSlice = createSlice({
   reducers: {
     setRole: (state, action: PayloadAction<RoleType | undefined>) => {
       state.role = action.payload
-      if (action.payload === undefined) {
-        state.isAuth = false
-      }
     }
   }
 })

@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { path } from '@/constants/path'
+import { useAppContext } from '@/context/app-provider'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/pages/login/auth.service'
-import { setRole } from '@/pages/login/auth.slice'
 import { useGetMeQuery } from '@/pages/manage/accounts/account.service'
 import { useAppDispatch } from '@/redux/hook'
 import { Link, useLocation, useNavigate } from 'react-router'
@@ -24,11 +24,13 @@ export default function DropdownAvatar() {
   const { data: getAccountRes } = useGetMeQuery()
   const dispatch = useAppDispatch()
   const [logout] = useLogoutMutation()
+  const { setRole, disconnectSocket } = useAppContext()
 
   const onLogout = async (refreshToken: string) => {
     try {
       await logout({ refreshToken }).unwrap()
-      dispatch(setRole())
+      setRole()
+      disconnectSocket()
       navigate(path.login, { state: { from: location.pathname } })
     } catch (error) {
       handleErrorApi({ error })

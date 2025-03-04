@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { handleErrorApi } from '@/lib/utils'
+import { useAppContext } from '@/context/app-provider'
+import { generateSocketInstace, handleErrorApi } from '@/lib/utils'
 import { useLoginGuestMutation } from '@/pages/guest/guest.service'
-import { setRole } from '@/pages/login/auth.slice'
 import { useAppDispatch } from '@/redux/hook'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +16,7 @@ export default function GuestLoginForm() {
   const [loginGuestMutation] = useLoginGuestMutation()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { setRole, setSocket } = useAppContext()
   const params = useParams()
   const tableNumber = Number(params.id)
   const [searchParams] = useSearchParams()
@@ -32,7 +33,8 @@ export default function GuestLoginForm() {
   const onLoginGuest = async (values: GuestLoginBodyType) => {
     try {
       const res = await loginGuestMutation(values).unwrap()
-      dispatch(setRole(res.data.guest.role))
+      setRole(res.data.guest.role)
+      setSocket(generateSocketInstace(res.data.accessToken))
       navigate('/guest/menu')
     } catch (error) {
       console.log(error)
