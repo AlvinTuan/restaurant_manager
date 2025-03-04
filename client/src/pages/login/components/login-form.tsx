@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useAppContext } from '@/context/app-provider'
 import { useToast } from '@/hooks/use-toast'
-import { handleErrorApi } from '@/lib/utils'
+import { generateSocketInstace, handleErrorApi } from '@/lib/utils'
 import { useLoginMutation } from '@/pages/login/auth.service'
-import { setRole } from '@/pages/login/auth.slice'
 import { PasswordInput } from '@/pages/login/components/password-input'
-import { useAppDispatch } from '@/redux/hook'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
@@ -16,7 +15,7 @@ import { useNavigate } from 'react-router'
 export default function LoginForm() {
   const { toast } = useToast()
   const [login, loginResult] = useLoginMutation()
-  const dispatch = useAppDispatch()
+  const { setRole, setSocket } = useAppContext()
   const navigate = useNavigate()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -32,7 +31,8 @@ export default function LoginForm() {
       toast({
         description: res.message
       })
-      dispatch(setRole(res.data.account.role))
+      setRole(res.data.account.role)
+      setSocket(generateSocketInstace(res.data.accessToken))
       navigate('/manage/dashboard')
     } catch (error) {
       console.log(error)

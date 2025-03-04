@@ -1,7 +1,7 @@
 import { ModeToggle } from '@/components/mode-toggle'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import NavItems from '@/pages/login/nav-items'
+import NavLinks from '@/pages/login/nav-links'
 import { Menu, Package2 } from 'lucide-react'
 import { Link, Outlet } from 'react-router'
 
@@ -14,7 +14,7 @@ export default function PublicLayout() {
             <Package2 className='w-6 h-6' />
             <span className='sr-only'>Big boy</span>
           </Link>
-          <NavItems className='flex-shrink-0 transition-colors text-muted-foreground hover:text-foreground' />
+          <NavLinks className='flex-shrink-0 transition-colors text-muted-foreground hover:text-foreground' />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -34,7 +34,7 @@ export default function PublicLayout() {
                 <span className='sr-only'>Big boy</span>
               </Link>
 
-              <NavItems className='transition-colors text-muted-foreground hover:text-foreground' />
+              <NavLinks className='transition-colors text-muted-foreground hover:text-foreground' />
             </nav>
           </SheetContent>
         </Sheet>
