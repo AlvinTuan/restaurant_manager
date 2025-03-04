@@ -47,9 +47,9 @@ export default function LoginForm() {
           name='email'
           render={({ field, formState: { errors } }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder='Username' {...field} />
+                <Input placeholder='user@example.com' {...field} />
               </FormControl>
               {errors.email && <FormMessage>{errors.email.message}</FormMessage>}
             </FormItem>
@@ -60,9 +60,9 @@ export default function LoginForm() {
           name='password'
           render={({ field, formState: { errors } }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Mật khẩu</FormLabel>
               <FormControl>
-                <PasswordInput placeholder='password' {...field} />
+                <PasswordInput placeholder='Password' {...field} />
               </FormControl>
               {errors.password && <FormMessage>{errors.password.message}</FormMessage>}
             </FormItem>

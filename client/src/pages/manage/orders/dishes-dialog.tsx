@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react'
 
 type DishItem = DishListResType['data'][0]
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const columns: ColumnDef<DishItem>[] = [
   {
     id: 'dishName',

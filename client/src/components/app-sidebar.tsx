@@ -1,39 +1,35 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger
-} from '@/components/ui/sidebar'
-import menuItems from '@/constants/menuItem'
+import { GalleryVerticalEnd } from 'lucide-react'
+import * as React from 'react'
 
-// Menu items.
+import { NavMain } from '@/components/nav-main'
+import { NavUser } from '@/components/nav-user'
+import { SidebarLogo } from '@/components/sidebar-logo'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 
-export function AppSidebar() {
+// This is sample data.
+const data = {
+  logo: [
+    {
+      name: 'PointSell',
+      logo: GalleryVerticalEnd,
+      plan: 'Enterprise'
+    }
+  ]
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar collapsible='icon' {...props}>
+      <SidebarHeader>
+        <SidebarLogo teams={data.logo} />
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarTrigger className='float-right'></SidebarTrigger>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.href}>
-                      <item.Icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavMain />
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }
