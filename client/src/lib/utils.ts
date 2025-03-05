@@ -175,7 +175,7 @@ export const OrderStatusIcon = {
   [OrderStatus.Paid]: HandCoins
 }
 
-export const generateSocketInstace = (accessToken: string) => {
+export const generateSocketInstance = (accessToken: string) => {
   const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000'
   return io(URL, {
     auth: {

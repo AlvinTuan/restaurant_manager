@@ -65,7 +65,7 @@ export default function DishCard() {
   return (
     <>
       {orders.map((order, index) => (
-        <div key={order.id} className='flex gap-4'>
+        <div key={order.id} className='flex gap-4 [&:not(:last-child)]:mb-4'>
           <div className='text-sm font-semibold'>{index + 1}</div>
           <div className='relative flex-shrink-0'>
             <img
@@ -85,7 +85,7 @@ export default function DishCard() {
           </div>
         </div>
       ))}
-      <div className='sticky bottom-0 '>
+      <div className='mt-10'>
         <div className='flex w-full space-x-4 text-xl font-semibold'>
           <span>Tổng cộng · {orders.length} món</span>
           <span>{formatCurrency(totalPrice)}</span>

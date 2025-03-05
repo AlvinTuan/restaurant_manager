@@ -1,4 +1,6 @@
 import { axiosBaseQuery } from '@/redux/api'
+import { LogoutBodyType } from '@/schemaValidations/auth.schema'
+import { MessageResType } from '@/schemaValidations/common.schema'
 import {
   GuestCreateOrdersBodyType,
   GuestCreateOrdersResType,
@@ -22,7 +24,7 @@ export const guestApi = createApi({
         }
       }
     }),
-    logoutGuest: build.mutation({
+    logoutGuest: build.mutation<MessageResType, LogoutBodyType>({
       query(body) {
         return {
           url: 'guest/auth/logout',
