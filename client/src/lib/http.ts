@@ -77,7 +77,6 @@ class Http {
     // Add a request interceptor
     this.instance.interceptors.request.use(
       (config) => {
-        console.log(this.accessToken)
         this.accessToken = getAccessTokenFromLS()
         if (this.accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${this.accessToken}`

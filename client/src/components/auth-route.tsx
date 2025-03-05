@@ -90,7 +90,6 @@ export default function AuthRoute() {
     socket?.on('connect', onConnect)
     socket?.on('disconnect', onDisconnect)
     socket?.on('refresh-token', onRefreshTokenSocket)
-    console.log('day ne day nee')
     return () => {
       clearInterval(interval)
       socket?.off('connect', onConnect)

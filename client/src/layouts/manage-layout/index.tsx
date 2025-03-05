@@ -10,7 +10,7 @@ import { useLogoutMutation } from '@/pages/login/auth.service'
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 
-export default function MainLayout() {
+export default function ManageLayout() {
   const { pathname } = useLocation()
   const [logoutMutation] = useLogoutMutation()
   const { setRole, socket, disconnectSocket } = useAppContext()

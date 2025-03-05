@@ -1,6 +1,6 @@
 import { RoleType } from '@/constants/jwt.types'
 import { clearLS, getAccessTokenFromLS } from '@/lib/auth'
-import { decodeToken, generateSocketInstace } from '@/lib/utils'
+import { decodeToken, generateSocketInstance } from '@/lib/utils'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { Socket } from 'socket.io-client'
 
@@ -29,7 +29,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       if (accessToken) {
         const role = decodeToken(accessToken)?.role
         setRoleState(role)
-        setSocket(generateSocketInstace(accessToken))
+        setSocket(generateSocketInstance(accessToken))
       }
       count.current++
     }

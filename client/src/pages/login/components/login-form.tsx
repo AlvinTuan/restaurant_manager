@@ -3,7 +3,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { useAppContext } from '@/context/app-provider'
 import { useToast } from '@/hooks/use-toast'
-import { generateSocketInstace, handleErrorApi } from '@/lib/utils'
+import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useLoginMutation } from '@/pages/login/auth.service'
 import { PasswordInput } from '@/pages/login/components/password-input'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
@@ -32,7 +32,7 @@ export default function LoginForm() {
         description: res.message
       })
       setRole(res.data.account.role)
-      setSocket(generateSocketInstace(res.data.accessToken))
+      setSocket(generateSocketInstance(res.data.accessToken))
       navigate('/manage/dashboard')
     } catch (error) {
       console.log(error)

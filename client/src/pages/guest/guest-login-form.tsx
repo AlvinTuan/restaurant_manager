@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAppContext } from '@/context/app-provider'
-import { generateSocketInstace, handleErrorApi } from '@/lib/utils'
+import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useLoginGuestMutation } from '@/pages/guest/guest.service'
 import { useAppDispatch } from '@/redux/hook'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
@@ -34,10 +33,9 @@ export default function GuestLoginForm() {
     try {
       const res = await loginGuestMutation(values).unwrap()
       setRole(res.data.guest.role)
-      setSocket(generateSocketInstace(res.data.accessToken))
+      setSocket(generateSocketInstance(res.data.accessToken))
       navigate('/guest/menu')
     } catch (error) {
-      console.log(error)
       handleErrorApi({ error, setError: form.setError })
     }
   }
@@ -45,7 +43,7 @@ export default function GuestLoginForm() {
   return (
     <Card className='max-w-sm mx-auto h-[50%] mt-10'>
       <CardHeader>
-        <CardTitle className='text-2xl'>Đăng nhập gọi món</CardTitle>
+        <CardTitle className='text-2xl'>Bạn hãy nhập tên của bạn để tiến hành gọi món nhé !</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -61,7 +59,7 @@ export default function GuestLoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className='grid gap-2'>
-                      <Label htmlFor='name'>Tên khách hàng</Label>
+                      {/* <Label htmlFor='name'></Label> */}
                       <Input id='name' type='text' required {...field} />
                       <FormMessage />
                     </div>
