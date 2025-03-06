@@ -1,3 +1,4 @@
+import ErrorBoundary from '@/components/error-boundary.tsx'
 import { ThemeProvider } from '@/components/theme-provider.tsx'
 import AppProvider from '@/context/app-provider.tsx'
 import { store } from '@/redux/store.ts'
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
           {/* <PersistGate loading={null} persistor={persistor}> */}
           <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
             <BrowserRouter>
-              <App />
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
             </BrowserRouter>
           </ThemeProvider>
           {/* </PersistGate> */}

@@ -2,7 +2,6 @@ import { Role } from '@/constants/type'
 import { useAppContext } from '@/context/app-provider'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { checkAndRefreshToken, decodeToken, isTokenExpired } from '@/lib/utils'
-import { useLogoutMutation } from '@/pages/login/auth.service'
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 
@@ -16,8 +15,7 @@ export default function AuthRoute() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const refreshToken = getRefreshTokenFromLS()
-  const [logoutMutation] = useLogoutMutation()
-  const { socket, setRole, disconnectSocket } = useAppContext()
+  const { socket, setRole } = useAppContext()
   // const [isDialogVisible, setDialogVisible] = useState(false)
 
   useEffect(() => {

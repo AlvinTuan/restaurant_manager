@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input'
 import { useAppContext } from '@/context/app-provider'
 import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useLoginGuestMutation } from '@/pages/guest/guest.service'
-import { useAppDispatch } from '@/redux/hook'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -13,7 +12,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router'
 
 export default function GuestLoginForm() {
   const [loginGuestMutation] = useLoginGuestMutation()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { setRole, setSocket } = useAppContext()
   const params = useParams()

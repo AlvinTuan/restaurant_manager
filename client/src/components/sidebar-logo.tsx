@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 
 export function SidebarLogo({
   teams
@@ -11,8 +11,7 @@ export function SidebarLogo({
     plan: string
   }[]
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam] = React.useState(teams[0])
 
   return (
     <SidebarMenu>

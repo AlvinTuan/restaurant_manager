@@ -45,7 +45,7 @@ export default function AutoPagination({
   pageSize,
   pathname = '/',
   isLink = true,
-  onClick = (pageNumber) => {}
+  onClick = (_pageNumber) => {}
 }: Props) {
   const renderPagination = () => {
     let dotAfter = false
