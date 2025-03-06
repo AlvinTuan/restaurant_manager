@@ -2,8 +2,8 @@ import { Badge } from '@/components/ui/badge'
 import { useAppContext } from '@/context/app-provider'
 import { useToast } from '@/hooks/use-toast'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
-import { useGetOrderOfGuestQuery } from '@/pages/guest/guest.service'
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
+import { useGetOrderOfGuestQuery } from '@/services/guest.service'
 import { useEffect } from 'react'
 
 export default function DishCard() {

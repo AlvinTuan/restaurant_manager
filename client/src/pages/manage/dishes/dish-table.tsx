@@ -39,9 +39,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast'
 import { formatCurrency, getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import AddDish from '@/pages/manage/dishes/add-dish'
-import { useDeleteDishMutation, useGetDishesQuery } from '@/pages/manage/dishes/dishes.service'
 import EditDish from '@/pages/manage/dishes/edit-dish'
 import { DishListResType } from '@/schemaValidations/dish.schema'
+import { useDeleteDishMutation, useGetDishesQuery } from '@/services/dishes.service'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 

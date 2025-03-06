@@ -1,5 +1,5 @@
 import { formatCurrency } from '@/lib/utils'
-import { useGetDishesQuery } from '@/pages/manage/dishes/dishes.service'
+import { useGetDishesQuery } from '@/services/dishes.service'
 
 export default function Home() {
   const { data: getDishesRes } = useGetDishesQuery()

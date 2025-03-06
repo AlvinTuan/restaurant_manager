@@ -1,13 +1,14 @@
+import { AppSidebar } from '@/components/app-sidebar'
 import { ModeToggle } from '@/components/mode-toggle'
+import { NavMainGuest } from '@/components/nav-main-guest'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebarGuest } from '@/pages/guest/components/sidebar/app-sidebar-guest'
 import { Outlet } from 'react-router'
 
 export default function GuestLayout() {
   return (
     <SidebarProvider>
-      <AppSidebarGuest />
+      <AppSidebar navComponent={<NavMainGuest />} isGuest />
       <SidebarInset>
         <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear justify-between group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 p-4'>
           <div className='flex items-center gap-2 px-4'>

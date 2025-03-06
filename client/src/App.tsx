@@ -1,4 +1,5 @@
 import AuthRoute from '@/components/auth-route'
+import Loading from '@/components/loading'
 import { Toaster } from '@/components/ui/toaster'
 import { path } from '@/constants/path'
 import GuestLayout from '@/layouts/guest-layout'
@@ -10,7 +11,7 @@ import { Navigate, Route, Routes } from 'react-router'
 // lazy loading page
 const Login = lazy(() => import('@/pages/login'))
 const TableOrder = lazy(() => import('@/pages/guest'))
-const GuestMenuOrder2 = lazy(() => import('@/pages/guest/menu/guest-menu-order'))
+const GuestMenuOrder = lazy(() => import('@/pages/guest/menu'))
 const GuestOrder = lazy(() => import('@/pages/guest/orders'))
 const Accounts = lazy(() => import('@/pages/manage/accounts'))
 const DashboardPage = lazy(() => import('@/pages/manage/dashboard'))
@@ -22,7 +23,7 @@ const NotFound = lazy(() => import('@/pages/not-found'))
 
 const LazyElement = ({ Component, title }: { Component: React.ElementType; title?: string }) => {
   return (
-    <Suspense>
+    <Suspense fallback={<Loading />}>
       {title && (
         <Helmet>
           <title>PointSell Restaurant | {`${title}`}</title>
@@ -43,7 +44,7 @@ const manageRoutes = [
 ]
 
 const guestRoutes = [
-  { path: path.guestMenu, element: GuestMenuOrder2, title: 'Gọi món' },
+  { path: path.guestMenu, element: GuestMenuOrder, title: 'Gọi món' },
   { path: path.guestOrder, element: GuestOrder, title: 'Trạng thái đơn hàng' }
 ]
 

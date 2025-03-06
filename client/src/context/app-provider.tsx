@@ -40,7 +40,6 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     setSocket(undefined)
   }
 
-  // Các bạn nào mà dùng Next.js 15 và React 19 thì không cần dùng useCallback đoạn này cũng được
   const setRole = (role?: RoleType | undefined) => {
     setRoleState(role)
     if (!role) {
@@ -48,7 +47,6 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     }
   }
   const isAuth = Boolean(role)
-  // Nếu mọi người dùng React 19 và Next.js 15 thì không cần AppContext.Provider, chỉ cần AppContext là đủ
   return (
     <AppContext.Provider value={{ role, setRole, isAuth, socket, setSocket, disconnectSocket }}>
       {children}
