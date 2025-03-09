@@ -7,5 +7,10 @@ export enum path {
   manageAccounts = '/manage/accounts',
   manageDishes = '/manage/dishes',
   manageTables = '/manage/tables',
-  manageOrders = '/manage/orders'
+  manageOrders = '/manage/orders',
+
+  // guest
+  guestLogin = '/table-order/:id',
+  guestMenu = '/guest/menu',
+  guestOrder = '/guest/orders'
 }

@@ -1,7 +1,6 @@
 import { GalleryVerticalEnd } from 'lucide-react'
 import * as React from 'react'
 
-import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import { SidebarLogo } from '@/components/sidebar-logo'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
@@ -17,18 +16,23 @@ const data = {
   ]
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  navComponent: React.ReactNode
+  isGuest?: boolean
+}
+
+export function AppSidebar({ navComponent, isGuest, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>
         <SidebarLogo teams={data.logo} />
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
+      <SidebarContent>{navComponent}</SidebarContent>
+      {!isGuest && (
+        <SidebarFooter>
+          <NavUser />
+        </SidebarFooter>
+      )}
       <SidebarRail />
     </Sidebar>
   )

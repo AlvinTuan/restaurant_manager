@@ -1,50 +1,75 @@
-# React + TypeScript + Vite
+# Dự án PointSell Restaurant Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dự án này là quản lý quán ăn được xây dựng bằng React, TypeScript và Vite.
 
-Currently, two official plugins are available:
+## Chức năng trong dự án
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Authentication module**: Quản lý bằng JWT
 
-## Expanding the ESLint configuration
+  - Đăng nhập
+  - Đăng xuất
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Quyền các role trong dự án**
 
-- Configure the top-level `parserOptions` property like this:
+  - **Owner**: có quyền thao tác mọi chức năng quản lý trên hệ thống, ngoại trừ việc gọi api order với vai trò là Guest
+    - Email: admin@order.com | Mật khẩu: 123456
+  - **Employee**: Tương tự Owner nhưng không có chức năng quản lý tài khoản nhân viên
+    - Email: employee@example.com | Mật khẩu: 123123
+  - **Guest**: Chỉ có quyền tạo order
+    - Chỉ cần nhập tên để đăng nhập
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Trang Dashboard**
+  - Thống kê tất cả liên quan tới nhà hàng bao gồm: Tổng doanh thu, số lượng khách, đơn hàng, bàn đang phục vụ
+  - Visualization doanh thu, xếp hạng trên biểu đồ
+  - Filter theo ngày (mặc định là ngày đăng nhập)
+- **Trang quản lý đơn hàng**:
+  - Hiển thị thông tin các món ăn mà khách hàng order
+  - Thao tác realtime thay đổi trạng thái các món ăn từ ví dụ: chờ xử lý, đang nấu, đã phục vụ.
+- **Trang quản lý bàn ăn**:
+  - Thêm, sửa, xoá, cập nhật bàn ăn.
+  - Có thể share qua link, hoặc QR để Guest vào bàn
+- **Trang quản lý msón ăn**:
+  - Thêm, sửa, xoá, cập nhật ăn
+  - Upload ảnh món ăn
+- **Trang quản lý account**:
+  - Update thông tin cá nhân
+  - Upload Avatar
+  - Đổi mật khẩu
+- **Trang quản lý nhân viên**:
+  - Thêm, sửa, xoá, cập nhật nhân viên
+  - Thay đổi quyền nhân viên
+  - Khi xoá nhân viên thì logout tài khoản nhân viên ngay lập tức
+- **Trang gọi món cho khách**:
+  - Khách hàng sau khi đăng nhập có thể gọi món, với các món ăn cùng số lượng mong muốn.
+- **Trang theo dõi đơn hàng**:
+  - Cho phép hàng theo dõi tiến độ đơn hàng.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Vì đây là một trang web phục vụ tại quầy, do đó khi khách muốn thanh toán sẽ thanh toán với nhân viên
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Công nghệ sử dụng
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+- **UI / CSS Library**: Tailwindcss + ShadCn/UI
+- **State Management**: RTK query cho async state và React Context cho state thường
+- **Form Management**: React Hook Form
+- **Router**: React Router
+- **Build tool**: Vite
+- **API**: Rest API dựa trên server được đính kèm
+- **Hỗ trợ SEO** với React Helmet
+- **Realtime** với socket
+
+## Cài đặt và Khởi chạy
+
+```bash
+# Clone repository
+git clone https://github.com/AlvinTuan/restaurant_manager
+cd shopee-clone
+
+# Cài đặt dependencies
+npm install
+
+# Chạy ở môi trường development
+npm run dev
+
+# Build cho production
+npm run build
 ```

@@ -9,8 +9,8 @@ import {
   getVietnameseOrderStatus,
   handleErrorApi
 } from '@/lib/utils'
-import { usePayForGuestMutation } from '@/pages/manage/orders/orders.service'
 import { GetOrdersResType, PayGuestOrdersResType } from '@/schemaValidations/order.schema'
+import { usePayForGuestMutation } from '@/services/orders.service'
 import { Fragment } from 'react'
 
 type Guest = GetOrdersResType['data'][0]['guest']

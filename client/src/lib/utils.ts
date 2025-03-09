@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import authApiRequest from '@/apiRequests/auth.api'
-import guestApiRequest from '@/apiRequests/guest.api'
 import { TokenPayload } from '@/constants/jwt.types'
 import { DishStatus, OrderStatus, Role, TableStatus } from '@/constants/type'
 import { toast } from '@/hooks/use-toast'
@@ -12,6 +10,8 @@ import {
   setRefreshTokenToLS
 } from '@/lib/auth'
 import { isEntityError } from '@/lib/helpers'
+import authApiRequest from '@/services/apiRequests/auth.api'
+import guestApiRequest from '@/services/apiRequests/guest.api'
 import { clsx, type ClassValue } from 'clsx'
 import { format } from 'date-fns'
 import { jwtDecode } from 'jwt-decode'

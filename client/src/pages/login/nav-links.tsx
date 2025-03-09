@@ -15,7 +15,7 @@ import { useAppContext } from '@/context/app-provider'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/pages/login/auth.service'
-import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { useAppSelector } from '@/redux/hook'
 import { Link } from 'react-router'
 
 const menuItems: {
@@ -52,7 +52,6 @@ const menuItems: {
 
 export default function NavLinks({ className }: { className?: string }) {
   const { role } = useAppSelector((state) => state.auth)
-  const dispatch = useAppDispatch()
   const [logoutMutaion] = useLogoutMutation()
   const refreshToken = getRefreshTokenFromLS()
   const { setRole, disconnectSocket } = useAppContext()

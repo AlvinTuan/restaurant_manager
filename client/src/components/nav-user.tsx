@@ -16,7 +16,7 @@ import { useAppContext } from '@/context/app-provider'
 import { getRefreshTokenFromLS } from '@/lib/auth'
 import { handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/pages/login/auth.service'
-import { useGetMeQuery } from '@/pages/manage/accounts/account.service'
+import { useGetMeQuery } from '@/services/account.service'
 import { Link, useNavigate } from 'react-router'
 
 export function NavUser() {

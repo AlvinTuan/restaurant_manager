@@ -1,16 +1,12 @@
 # Giới thiệu về API
 
-Đây là backend API cho dự án Order món ă
+Đây là backend API cho dự án Order món ăn
 
 - Authentication: Login, Register, Logout
 - Account: Get thông tin cá nhân, Cập nhật thông tin cá nhân
 - Dish: Đọc, Thêm, Sửa, Xóa món ăn
 - Media: Upload hình ảnh
 - Test API
-
-> Lưu ý quan trọng: thỉnh thoảng nên pull code mới từ github repo của mình về, vì đôi khi mình có cập nhật logic API trong quá trình mình quay video
-
-> Trong file `server/.env` có thuộc tính `COOKIE_MODE`, hãy set `true` nếu bạn muốn dùng cookie cho việc authentication ở server
 
 ## Công nghệ sử dụng
 
@@ -117,18 +113,11 @@ API xác thực người dùng thông qua session token, session token này là 
 
 - `POST /guest/orders`: Tạo order mới
 
-## Setup nhanh postman
-
-> Hiện tại thì chưa có file collection Postman, khi nào mình quay xong khóa học mình sẽ update lên nhé
-
-Mình có lưu 1 file là `NextJs Free API.postman_collection.json` trong thư mục `server`, các bạn chỉ cần import file này vào Postman là có ngay collection của mình. Tiếp theo các bạn tạo 1 environment mới, và set biến `host` là `http://localhost:4000`, và chọn environment này khi gọi API là xong.
-
 ## Tài khoản mặc định
 
 Tài khoản admin: admin@order.com | 123456
 Tài khoản user:
 
-- phuminhdat@gmail.com | 123123
 - buianhson@gmail.com | 123123
 - ngocbichhuynh@gmail.com | 123123
 - binhnguyen@gmail.com | 123123

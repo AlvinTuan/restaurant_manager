@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatCurrency, getVietnameseDishStatus, simpleMatchText } from '@/lib/utils'
-import { useGetDishesQuery } from '@/pages/manage/dishes/dishes.service'
 import { DishListResType } from '@/schemaValidations/dish.schema'
+import { useGetDishesQuery } from '@/services/dishes.service'
 import {
   ColumnDef,
   ColumnFiltersState,
