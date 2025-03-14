@@ -53,11 +53,12 @@ const menuItems: {
 export default function NavLinks({ className }: { className?: string }) {
   const { role } = useAppSelector((state) => state.auth)
   const [logoutMutaion] = useLogoutMutation()
-  const refreshToken = getRefreshTokenFromLS()
   const { setRole, disconnectSocket } = useAppContext()
 
   const logout = () => {
     try {
+      const refreshToken = getRefreshTokenFromLS()
+
       logoutMutaion({ refreshToken })
       setRole()
       disconnectSocket()

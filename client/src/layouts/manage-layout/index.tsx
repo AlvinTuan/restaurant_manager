@@ -15,7 +15,6 @@ export default function ManageLayout() {
   const { pathname } = useLocation()
   const [logoutMutation] = useLogoutMutation()
   const { setRole, socket, disconnectSocket } = useAppContext()
-  const refreshToken = getRefreshTokenFromLS()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -26,6 +25,7 @@ export default function ManageLayout() {
     if (pathname === path.login) return
     function onLogout() {
       try {
+        const refreshToken = getRefreshTokenFromLS()
         logoutMutation(refreshToken)
         setRole()
         disconnectSocket()
@@ -40,7 +40,7 @@ export default function ManageLayout() {
     return () => {
       socket?.off('logout', onLogout)
     }
-  }, [socket, pathname, setRole, disconnectSocket, logoutMutation, refreshToken, navigate])
+  }, [socket, pathname, setRole, disconnectSocket, logoutMutation, navigate])
   return (
     <>
       <SidebarProvider>

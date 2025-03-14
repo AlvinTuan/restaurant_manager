@@ -15,11 +15,11 @@ const unAuthPaths = ['/login']
 export default function AuthRoute() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const refreshToken = getRefreshTokenFromLS()
   const { socket, setRole } = useAppContext()
   // const [isDialogVisible, setDialogVisible] = useState(false)
 
   useEffect(() => {
+    const refreshToken = getRefreshTokenFromLS()
     const decodeRefreshToken = decodeToken(refreshToken)
     const isAccessTokenExp = isTokenExpired(decodeRefreshToken)
     const role = decodeRefreshToken && (decodeRefreshToken.role as string)
@@ -51,7 +51,7 @@ export default function AuthRoute() {
     if (isNotOwnerGoToOwnerPath || isGuestGoToManagePath || isNotGuestGoToGuestPath) {
       navigate(path.manageDashboard, { state: { from: pathname } })
     }
-  }, [navigate, pathname, refreshToken, setRole])
+  }, [navigate, pathname, setRole])
 
   useEffect(() => {
     if (unAuthPaths.includes(pathname)) return
@@ -68,7 +68,7 @@ export default function AuthRoute() {
     }
 
     onRefreshToken()
-    const TIME_OUT = 60 * 60 * 1000
+    const TIME_OUT = 1000
     interval = setInterval(onRefreshToken, TIME_OUT)
     socket?.connect()
     if (socket?.connected) {

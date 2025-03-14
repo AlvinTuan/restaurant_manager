@@ -35,7 +35,6 @@ export default function LoginForm() {
       setSocket(generateSocketInstance(res.data.accessToken))
       navigate('/manage/dashboard')
     } catch (error) {
-      console.log(error)
       handleErrorApi({ error, setError: form.setError })
     }
   }
