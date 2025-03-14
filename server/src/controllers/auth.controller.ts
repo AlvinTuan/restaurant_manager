@@ -69,6 +69,11 @@ export const refreshTokenController = async (refreshToken: string) => {
       account: true
     }
   })
+
+  if (!refreshTokenDoc) {
+    throw new AuthError('Refresh token không tồn tại')
+  }
+
   const account = refreshTokenDoc.account
   const newAccessToken = signAccessToken({
     userId: account.id,
@@ -80,13 +85,6 @@ export const refreshTokenController = async (refreshToken: string) => {
     exp: decodedRefreshToken.exp
   })
 
-  console.log('refreshTokenDoc:', refreshTokenDoc)
-  console.log('newRefreshToken:', newRefreshToken)
-  await prisma.refreshToken.delete({
-    where: {
-      token: refreshToken
-    }
-  })
   await prisma.refreshToken.create({
     data: {
       accountId: account.id,
@@ -94,6 +92,13 @@ export const refreshTokenController = async (refreshToken: string) => {
       expiresAt: refreshTokenDoc.expiresAt
     }
   })
+
+  await prisma.refreshToken.delete({
+    where: {
+      token: refreshToken
+    }
+  })
+
   return {
     accessToken: newAccessToken,
     refreshToken: newRefreshToken

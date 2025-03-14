@@ -24,14 +24,14 @@ export function NavUser() {
   const { data: getMeRes } = useGetMeQuery()
   const user = getMeRes && getMeRes.data
 
-  const [logout] = useLogoutMutation()
+  const [logoutMutation] = useLogoutMutation()
   const { setRole, disconnectSocket } = useAppContext()
   const navigate = useNavigate()
-  const refreshToken = getRefreshTokenFromLS()
 
-  const onLogout = async (refreshToken: string) => {
+  const onLogout = async () => {
     try {
-      await logout({ refreshToken }).unwrap()
+      const refreshToken = getRefreshTokenFromLS()
+      await logoutMutation({ refreshToken }).unwrap()
       setRole()
       disconnectSocket()
       navigate(path.login, { state: { from: location.pathname } })
@@ -90,7 +90,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onLogout(refreshToken)}>
+            <DropdownMenuItem onClick={() => onLogout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

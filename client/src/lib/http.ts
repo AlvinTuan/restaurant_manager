@@ -8,7 +8,7 @@ import {
 import { LoginResType } from '@/schemaValidations/auth.schema'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
-enum HttpStatus {
+export enum HttpStatus {
   ENTITY_ERROR_STATUS = 422,
   UNAUTHORIZED_ERROR_STATUS = 401
 }
